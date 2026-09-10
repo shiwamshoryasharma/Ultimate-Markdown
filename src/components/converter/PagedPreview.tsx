@@ -47,7 +47,7 @@ export function PagedPreview({ model, settings, onReady }: { model: ExportModel;
   }, [zoom])
   const go = (number: number) => {
     setPage(number)
-    frameRef.current?.contentDocument?.querySelectorAll('.pagedjs_page')[number - 1]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    frameRef.current?.contentDocument?.querySelectorAll('.pagedjs_page')[number - 1]?.scrollIntoView({ behavior: (document.documentElement.dataset.reducedMotion === 'true' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'auto' : 'smooth', block: 'start' })
   }
   return <div className={styles.root}>
     <div className={styles.toolbar}>

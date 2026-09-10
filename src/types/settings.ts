@@ -17,6 +17,9 @@ export interface PreviewSettings {
   contentWidth: 'narrow' | 'comfortable' | 'wide' | 'full'
   codeTheme: CodeTheme
   showToc: boolean
+  tableDensity: 'comfortable' | 'compact'
+  imageCaptions: boolean
+  reducedMotion: boolean
 }
 
 export interface ExportSettings {
@@ -47,6 +50,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
     contentWidth: 'comfortable',
     codeTheme: 'auto',
     showToc: true,
+    tableDensity: 'comfortable',
+    imageCaptions: true,
+    reducedMotion: false,
   },
   export: {
     paperSize: 'a4',

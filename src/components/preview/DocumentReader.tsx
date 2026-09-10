@@ -37,7 +37,7 @@ export function DocumentReader(props: ComponentProps<typeof MarkdownPreview>) {
     {canContinue && <div className="document-reading-mode"><FolderHeart size={18} /><label>Reading <Select aria-label="Document reading mode" value={continuous ? 'continuous' : 'single'} onChange={(e) => setContinuous(e.target.value === 'continuous')}><option value="single">Single document</option><option value="continuous">Follow Next links</option></Select></label>{continuous && <span>{loading ? 'Loading…' : chain.length + ' documents'}</span>}</div>}
     {current?.node.standalone && <div className="document-asset-help"><ImagePlus size={22} /><span><strong>Images live beside your Markdown file.</strong><br />Connect the folder containing this file to load its images, or use Locate image below. Your text stays open.</span><button type="button" onClick={() => void attachFolder(current.id)}>{assets ? 'Change image folder' : 'Connect image folder'}</button></div>}
     {continuous && canContinue && warnings.length > 0 && <details className="document-reading-warnings"><summary>Linked document warnings</summary>{warnings.map((warning) => <p key={warning}>{warning}</p>)}</details>}
-    <MarkdownPreview {...props} workspace={assets} />
+    <MarkdownPreview key={props.documentPath} {...props} workspace={assets} navigationWorkspace={canContinue ? props.workspace : null} />
     {continuous && canContinue && chain.filter((doc) => doc.path !== props.documentPath).map((doc) => <section key={doc.id}><div className="document-boundary">{doc.path}</div><MarkdownPreview {...props} workspace={doc.assetWorkspace ?? props.workspace} content={doc.content} documentPath={doc.path} /></section>)}
   </div>
 }

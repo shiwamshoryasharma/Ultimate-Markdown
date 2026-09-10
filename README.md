@@ -49,7 +49,9 @@ A Markdown workspace that turns your notes and linked manuals into documents rea
 | 🎨 **Design the output** | Six colour themes, five style presets, 20 font choices, page and text colours, and independent heading/body/code sizes. |
 | 📐 **Control the page** | One, two, or three columns; margins; portrait/landscape; A4, A3, Letter, and Legal paper. |
 | 📄 **Preview and export** | Paginated PDF preview, page count and zoom, plus DOCX, HTML, TXT, and XLSX export. |
-| 🌗 **Make it comfortable** | Light/dark/system themes, responsive layouts, and focused reader mode. |
+| 🌗 **Make it comfortable** | Coloured Settings cards, light/dark/system themes, reading presets, compact tables, reduced motion, and a live reading preview. |
+| 🖼️ **Explore rich content** | Image zoom and downloads; themed video/audio playback, seeking, volume and speed; video fullscreen. |
+| 🧾 **Work with tables** | Modern responsive tables with row highlights, copy-to-clipboard, and CSV downloads. |
 
 Documents are processed locally in your browser. There is no application backend, account requirement, or document-upload service. Remote images referenced by your Markdown may still be fetched from their original URLs.
 
@@ -67,6 +69,14 @@ Use the file explorer to switch documents. Opened documents appear as tabs. The 
 ### 2. Write, preview, and save
 
 Edit in **Workspace** and see the rendered result beside your Markdown. Use the toolbar to insert headings, emphasis, lists, links, images, tables, code, and math. Switch to reader mode when you want to focus on the document, and use the table of contents to jump between headings.
+
+Recognized **Previous / Next** links become themed navigation cards, with **Top**, **Bottom**, and a **Jump to document** menu when a folder is open. Common variations work: bold labels, arrows, reversed order, separate paragraphs, lists, reference links, and two-column navigation tables. Ordinary prose and code examples stay intact. File names can be anything; explicit links determine the order.
+
+Tables have responsive scrolling, clearer headers, **Copy**, and **CSV** actions. Click an unlinked image to expand it, zoom from 100–300%, or download it; **Escape** closes the viewer. Linked images retain their original link. Videos and audio use themed controls for playback, seeking, volume, and speed; videos also support fullscreen. Remote downloads depend on the source server and browser. Local media needs access to its source folder.
+
+Open **Settings** using the gear icon. Choose a coloured **Appearance**, **Editor**, **Reading**, **Media**, or **Export** card to reveal that section. Try **Comfort reading** or **Dense documents**, choose table density, toggle image captions, or reduce motion. Preferences save automatically on this device. Export defaults update the converter directly; each card has its own Reset action.
+
+![Settings with coloured category cards, theme choices, and a live reading preview](readme_assets/settings.png)
 
 Select **Save** or use the save shortcut. When the browser grants write access, saving updates the selected file; otherwise, the app downloads a copy. Save your edits before reloading or closing the tab: open document contents are not persisted across reloads.
 

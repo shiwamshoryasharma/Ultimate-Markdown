@@ -24,6 +24,10 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: 'ultimate-markdown/settings',
       version: 1,
+      merge: (persisted, current) => {
+        const saved = persisted as Partial<AppSettings> | undefined
+        return { ...current, ...saved, editor: { ...DEFAULT_SETTINGS.editor, ...saved?.editor }, preview: { ...DEFAULT_SETTINGS.preview, ...saved?.preview }, export: { ...DEFAULT_SETTINGS.export, ...saved?.export } }
+      },
     },
   ),
 )

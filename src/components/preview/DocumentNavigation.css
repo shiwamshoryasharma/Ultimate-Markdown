@@ -1,0 +1,29 @@
+/* App-owned navigation overrides decorative Markdown CSS without changing it. */
+.markdown-content .um-document-nav { display:block!important; margin:32px 0!important; padding:24px!important; border:1px solid var(--um-outline-variant)!important; border-radius:22px!important; background:var(--um-surface)!important; color:var(--um-text)!important; box-shadow:var(--um-elevation-1)!important; font-family:var(--um-font-sans)!important; text-align:left!important; width:auto!important; max-width:100%!important; box-sizing:border-box!important; container-type:inline-size; }
+.markdown-content .um-document-nav * { box-sizing:border-box; }
+.markdown-content .um-document-nav__header {display:flex!important; align-items:center!important; gap:12px!important; margin:0 0 20px!important;}
+.markdown-content .um-document-nav__mark {display:grid; place-items:center; width:42px; height:42px; flex-shrink:0; color:var(--um-primary); background:var(--um-primary-container); border-radius:13px;}
+.markdown-content .um-document-nav__eyebrow {display:block; color:var(--um-primary); font-size:10px; font-weight:750; letter-spacing:.14em; line-height:1.5;}
+.markdown-content .um-document-nav h2 {font:700 19px/1.4 var(--um-font-sans)!important; color:var(--um-text)!important; border:0!important; margin:2px 0 0!important; padding:0!important; text-transform:none!important;}
+.markdown-content .um-document-nav__cards {display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:12px!important;}
+.markdown-content .um-document-nav__card {appearance:none!important; display:flex!important; align-items:center!important; gap:14px!important; min-width:0!important; width:100%!important; padding:20px!important; margin:0!important; border:1px solid var(--um-outline)!important; border-radius:16px!important; background:var(--um-surface-container)!important; color:var(--um-text)!important; font-family:var(--um-font-sans)!important; text-align:left!important; cursor:pointer; transition:transform .18s,border-color .18s,box-shadow .18s;}
+.markdown-content .um-document-nav__card[data-direction=next] {background:linear-gradient(135deg,var(--um-primary-container),var(--um-surface))!important; border-color:color-mix(in srgb,var(--um-primary) 30%,var(--um-outline))!important;}
+.markdown-content .um-document-nav__card:only-child {grid-column:1/-1;}
+.markdown-content .um-document-nav__card:hover:not(:disabled) {transform:translateY(-2px); border-color:var(--um-primary)!important; box-shadow:var(--um-elevation-2)!important;}
+.markdown-content .um-document-nav__card:focus-visible,.markdown-content .um-document-nav__scroll button:focus-visible,.markdown-content .um-document-nav__jump [role=combobox]:focus-visible {outline:3px solid var(--um-primary)!important; outline-offset:3px;}
+.markdown-content .um-document-nav__card:disabled {cursor:default; opacity:.72;}
+.markdown-content .um-document-nav__arrow {display:grid; place-items:center; flex-shrink:0; width:38px; height:38px; border:1px solid var(--um-outline-variant); border-radius:50%; background:var(--um-surface); color:var(--um-primary);}
+.markdown-content .um-document-nav__card[data-direction=next] .um-document-nav__arrow {order:2; margin-left:auto; background:var(--um-primary); color:var(--um-text-on-primary); border-color:transparent;}
+.markdown-content .um-document-nav__copy {display:flex; flex-direction:column; gap:5px; min-width:0;}
+.markdown-content .um-document-nav__label {color:var(--um-primary)!important; font-size:11px!important; font-weight:700!important; line-height:1.4!important; letter-spacing:.05em; text-transform:uppercase;}
+.markdown-content .um-document-nav__copy strong {color:var(--um-text)!important; font-size:16px!important; font-weight:700!important; line-height:1.45!important; overflow-wrap:anywhere;}
+.markdown-content .um-document-nav__hint {color:var(--um-text-secondary)!important; font-size:11px!important; line-height:1.4!important;}
+.markdown-content .um-document-nav__tools {display:flex!important; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; margin-top:18px; padding-top:16px; border-top:1px solid var(--um-outline-variant);}
+.markdown-content .um-document-nav__jump {display:flex; align-items:center; gap:8px; color:var(--um-text-secondary); min-width:0; flex:1 1 180px;}
+.markdown-content .um-document-nav__jump [role=combobox] {font:500 12px/1.5 var(--um-font-sans)!important; color:var(--um-text)!important; background:var(--um-surface-container)!important; border:1px solid var(--um-outline)!important; border-radius:9px!important; padding:9px!important; width:100%!important; min-width:0!important; max-width:300px!important; cursor:pointer;}
+.markdown-content .um-document-nav__scroll {display:flex; gap:6px; margin-left:auto;}
+.markdown-content .um-document-nav__scroll button {display:inline-flex!important; align-items:center!important; gap:5px!important; font:600 12px/1.5 var(--um-font-sans)!important; color:var(--um-text-secondary)!important; background:var(--um-surface-container)!important; border:1px solid var(--um-outline-variant)!important; border-radius:9px!important; padding:8px 10px!important; margin:0!important; cursor:pointer;}
+.markdown-content .um-document-nav__scroll button:hover {color:var(--um-primary)!important; border-color:var(--um-primary)!important;}
+@container (max-width:450px) {.markdown-content .um-document-nav__cards {grid-template-columns:minmax(0,1fr)!important;} .markdown-content .um-document-nav__card {padding:16px!important;}}
+@media (max-width:640px) {.markdown-content .um-document-nav {padding:16px!important; border-radius:18px!important;}}
+@media (prefers-reduced-motion:reduce) {.markdown-content .um-document-nav__card {transition:none;}}

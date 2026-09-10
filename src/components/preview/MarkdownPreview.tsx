@@ -17,7 +17,10 @@ import { documentStylePlugin, appendDocumentCss } from '@/services/markdown/docu
 import { slugify } from '@/services/markdown/slug'
 import { CodeBlock } from './CodeBlock'
 import { PreviewImage } from './PreviewImage'
+import { PreviewTable } from './PreviewTable'
 import { PreviewLink } from './PreviewLink'
+import { DocumentNavigation } from './DocumentNavigation'
+import { navigationPlugin } from '@/services/markdown/navigationPlugin'
 import { PreviewVideo, PreviewAudio, PreviewSource } from './PreviewMedia'
 import { PreviewContextProvider } from './PreviewContext'
 import '@/styles/markdown-content.css'
@@ -29,6 +32,7 @@ interface MarkdownPreviewProps {
   content: string
   documentPath: string
   workspace: Workspace | null
+  navigationWorkspace?: Workspace | null
   onNavigateToDocument?: (path: string) => void
   fontSize?: number
   contentWidth?: PreviewSettings['contentWidth']
@@ -48,14 +52,14 @@ function headingIds() {
     walk(tree)
   }
 }
-const components = { pre: CodeBlock, img: PreviewImage, a: PreviewLink, video: PreviewVideo, audio: PreviewAudio, source: PreviewSource }
-function MarkdownPreviewImpl({ content, documentPath, workspace, onNavigateToDocument, fontSize = 16, contentWidth = 'comfortable', className }: MarkdownPreviewProps) {
+const components = { pre: CodeBlock, img: PreviewImage, table: PreviewTable, a: PreviewLink, nav: DocumentNavigation, video: PreviewVideo, audio: PreviewAudio, source: PreviewSource }
+function MarkdownPreviewImpl({ content, documentPath, workspace, navigationWorkspace = workspace, onNavigateToDocument, fontSize = 16, contentWidth = 'comfortable', className }: MarkdownPreviewProps) {
   const id = 'preview-' + useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const plugins = useMemo<NonNullable<Parameters<typeof ReactMarkdown>[0]['rehypePlugins']>>(() => [
     rehypeRaw, [documentStylePlugin, { scope: '#' + id }],
-    [rehypeSanitize, markdownSanitizeSchema], rehypeHighlight, rehypeKatex, headingIds, appendDocumentCss,
+    [rehypeSanitize, markdownSanitizeSchema], rehypeHighlight, rehypeKatex, headingIds, navigationPlugin, appendDocumentCss,
   ], [id])
-  return <PreviewContextProvider value={{ documentPath, workspace, onNavigateToDocument }}>
+  return <PreviewContextProvider value={{ documentPath, workspace, navigationWorkspace, onNavigateToDocument }}>
     <div id={id} className={clsx('markdown-content', styles.content, styles[contentWidth], className)} style={{ fontSize: fontSize + 'px' }}>
       <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={plugins} components={components}>{content}</ReactMarkdown>
     </div>

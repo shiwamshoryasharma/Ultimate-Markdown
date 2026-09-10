@@ -20,6 +20,7 @@ import { resolveLocalAsset, releaseLocalAsset } from '@/services/filesystem/loca
 import { markdownSanitizeSchema } from '@/services/markdown/sanitizeSchema'
 import { documentStylePlugin } from '@/services/markdown/documentStyles'
 import { isRemoteUrl, markdownTarget } from '@/services/markdown/documentLinks'
+import { readNavigation } from '@/services/markdown/navigationPlugin'
 import { slugify } from '@/services/markdown/slug'
 
 export interface SourceDocument { id: string; path: string; content: string; assetWorkspace?: Workspace | null; standalone?: boolean }
@@ -66,6 +67,8 @@ export async function collectDocuments(workspace: Workspace | null, open: Map<st
     result.push({ id, path: node.path, content, standalone: node.standalone, assetWorkspace: node.assetWorkspace ?? (node.standalone ? null : workspace) })
     if (!followChain) return
     const { tree } = parseDocument(content, 'discovery')
+    const navigation = new Map<string, 'previous' | 'next'>()
+    walkElements(tree, element => { for (const item of readNavigation(element) ?? []) navigation.set(item.href, item.direction) })
     const links: { target: string; next: boolean; previous: boolean }[] = []
     walkElements(tree, (element, parent) => {
       if (element.tagName !== 'a' || typeof element.properties.href !== 'string') return
@@ -74,7 +77,8 @@ export async function collectDocuments(workspace: Workspace | null, open: Map<st
       const index = parent.children.indexOf(element)
       const before = parent.children.slice(0, index).map(nodeText).join('').split(/\|\||\n/).pop() ?? ''
       const label = `${before.slice(-30)} ${nodeText(element)}`
-      links.push({ target, next: /\b(next|continue)\b/i.test(label), previous: /\b(previous|prev|back)\b/i.test(label) })
+      const detected = navigation.get(element.properties.href)
+      links.push({ target, next: detected ? detected === 'next' : /\b(next|continue)\b/i.test(label), previous: detected ? detected === 'previous' : /\b(previous|prev|back)\b/i.test(label) })
     })
     const nextLinks = links.filter((link) => link.next && !link.previous)
     const follow = nextLinks
@@ -183,26 +187,13 @@ export function plainText(tree: Root): string {
 /** Navigation chrome is removed as a unit; ordinary references remain content. */
 function navigationBlocks(tree: Root): Set<Element> {
   const removed = new Set<Element>()
-  const withoutLinks = (node: RootContent): string => {
-    if (node.type === 'text') return node.value
-    if (node.type !== 'element') return ''
-    if (node.tagName === 'a') return ''
-    return node.children.map(withoutLinks).join('')
-  }
-  const isNavigation = (node: RootContent): node is Element => {
-    if (node.type !== 'element' || !['p', 'blockquote', 'div', 'nav'].includes(node.tagName)) return false
-    let localLink = false
-    walkElements(node, (child) => { if (child.tagName === 'a' && typeof child.properties.href === 'string' && /\.(md|markdown)(?:[?#]|$)/i.test(child.properties.href) && !isRemoteUrl(child.properties.href)) localLink = true })
-    const text = nodeText(node)
-    if (!localLink || !/\b(previous|prev|next|continue|back)\s*:/i.test(text)) return false
-    return withoutLinks(node).replace(/\b(previous|prev|next|continue|back|document navigation)\b/gi, '').replace(/[\s:|→←•·—–-]/g, '') === ''
-  }
+  const isNavigation = (node: RootContent): node is Element => readNavigation(node) !== null
   const scan = (parent: Root | Element) => {
     for (let i = 0; i < parent.children.length; i++) {
       const child = parent.children[i]
       if (isNavigation(child)) removed.add(child)
       if (child.type !== 'element') continue
-      if (/^h[1-6]$/.test(child.tagName) && /^document navigation$/i.test(nodeText(child).trim())) {
+      if (/^h[1-6]$/.test(child.tagName) && /^(document|page|chapter)?\s*navigation$/i.test(nodeText(child).trim())) {
         const next = parent.children.slice(i + 1).find((node) => node.type !== 'text' || node.value.trim())
         if (next && isNavigation(next)) { removed.add(child); removed.add(next) }
       }

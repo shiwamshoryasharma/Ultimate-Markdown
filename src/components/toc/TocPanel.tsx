@@ -60,7 +60,7 @@ export function TocPanel({ content, scrollContainerRef }: TocPanelProps) {
   const handleClick = (slug: string) => {
     const container = scrollContainerRef.current
     const el = container?.querySelector(`#${CSS.escape(slug)}`)
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    el?.scrollIntoView({ behavior: (document.documentElement.dataset.reducedMotion === 'true' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'auto' : 'smooth', block: 'start' })
   }
 
   return (

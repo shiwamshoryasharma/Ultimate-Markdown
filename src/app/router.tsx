@@ -1,10 +1,12 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, createHashRouter } from 'react-router-dom'
 import { HomePage } from '@/pages/HomePage'
 import { WorkspacePage } from '@/pages/WorkspacePage'
 import { ConverterPage } from '@/pages/ConverterPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 
-export const router = createBrowserRouter([
+// Hash routes let static hosts refresh pages without server-side rewrites.
+const createRouter = import.meta.env.PROD ? createHashRouter : createBrowserRouter
+export const router = createRouter([
   { path: '/', element: <HomePage /> },
   { path: '/workspace', element: <WorkspacePage /> },
   { path: '/converter', element: <ConverterPage /> },

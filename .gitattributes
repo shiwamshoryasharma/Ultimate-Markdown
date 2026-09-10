@@ -1,0 +1,2 @@
+# Preserve generated build bytes and collapse them in GitHub code reviews.
+web/** -text -whitespace linguist-generated=true

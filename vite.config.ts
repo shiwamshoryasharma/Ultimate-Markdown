@@ -5,6 +5,8 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Portable across project Pages paths and custom domains.
+  base: './',
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] })

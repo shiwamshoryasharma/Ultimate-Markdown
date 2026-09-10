@@ -21,7 +21,7 @@ export function TopAppBar({ actions }: TopAppBarProps) {
   return (
     <header className={styles.bar}>
       <div className={styles.brand}>
-        <img className={styles.mark} src="/ultimate-markdown-logo.png" alt="" width="36" height="36" />
+        <img className={styles.mark} src={`${import.meta.env.BASE_URL}ultimate-markdown-logo.png`} alt="" width="36" height="36" />
         <span className={styles.wordmark}>Ultimate Markdown</span>
       </div>
 

@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "postbuild": "node scripts/prepare-web.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:web": "node tests/static-host.mjs"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.20.3",

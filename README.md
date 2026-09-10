@@ -243,6 +243,12 @@ firebase deploy --only hosting --project ultimate-markdown --config firebase.jso
 
 Keep the explicit project flag. This deploys Hosting only; it does not deploy databases, rules, or functions. No Firebase SDK initialization is required for this static app.
 
+### Google Search Console verification
+
+The owner's verification file is kept in `public/google03be7e7f616f4d9f.html`. Each build copies it into `dist` and `web`, so it remains available after redeployment at [the verification URL](https://ultimate-markdown.web.app/google03be7e7f616f4d9f.html).
+
+For the `https://ultimate-markdown.web.app/` URL-prefix property, choose **HTML file** verification and click **Verify** after deployment. Keep the file's name and content unchanged. Google checks this file at the website root, independently of the app's interface.
+
 ### Check the build
 
 ```sh

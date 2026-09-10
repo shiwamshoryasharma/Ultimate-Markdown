@@ -1,0 +1,27 @@
+.content {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: var(--um-space-8) var(--um-space-10);
+}
+
+.narrow {
+  max-width: 620px;
+}
+
+.comfortable {
+  max-width: 820px;
+}
+
+.wide {
+  max-width: 1100px;
+}
+
+.full {
+  max-width: none;
+}
+
+@media (max-width: 640px) {
+  .content {
+    padding: var(--um-space-5) var(--um-space-4);
+  }
+}

@@ -1,0 +1,42 @@
+.panel {
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--um-space-3) var(--um-space-2);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 7px var(--um-space-3);
+  border-radius: var(--um-radius-sm);
+  font-size: var(--um-font-size-sm);
+  color: var(--um-text-secondary);
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: background-color var(--um-duration-fast) var(--um-ease-standard), color var(--um-duration-fast) var(--um-ease-standard);
+}
+
+.item:hover {
+  background: var(--um-surface-container-high);
+  color: var(--um-text);
+}
+
+.active {
+  background: var(--um-primary-container);
+  color: var(--um-on-primary-container);
+  font-weight: 600;
+}

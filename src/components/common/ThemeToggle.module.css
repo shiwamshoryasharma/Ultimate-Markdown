@@ -1,0 +1,38 @@
+.group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: var(--um-surface-container-high);
+  border-radius: var(--um-radius-full);
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--um-radius-full);
+  background: transparent;
+  color: var(--um-text-tertiary);
+  cursor: pointer;
+  transition: background-color var(--um-duration-fast) var(--um-ease-standard),
+    color var(--um-duration-fast) var(--um-ease-standard);
+}
+
+.option svg {
+  width: 16px;
+  height: 16px;
+}
+
+.option:hover {
+  color: var(--um-text);
+}
+
+.active {
+  background: var(--um-surface);
+  color: var(--um-primary);
+  box-shadow: var(--um-elevation-1);
+}

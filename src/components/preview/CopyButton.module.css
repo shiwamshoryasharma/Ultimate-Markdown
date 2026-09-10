@@ -1,0 +1,25 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--um-outline);
+  border-radius: var(--um-radius-full);
+  background: var(--um-surface);
+  color: var(--um-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--um-duration-fast) var(--um-ease-standard), color var(--um-duration-fast) var(--um-ease-standard);
+}
+
+.button:hover {
+  background: var(--um-surface-container-high);
+  color: var(--um-text);
+}
+
+.button svg {
+  width: 13px;
+  height: 13px;
+}

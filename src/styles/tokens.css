@@ -1,0 +1,206 @@
+/*
+  Design tokens for Ultimate Markdown.
+
+  Visual language is inspired by Android 17 / Samsung One UI 9: soft layered
+  surfaces, highly rounded containers, generous spacing, diffuse shadows.
+  No proprietary assets, icons, or exact color values are copied from any
+  Samsung product — this is an independent token set in that style.
+
+  Theme resolution: `settingsStore` writes `data-theme="light"|"dark"` on
+  <html> for an explicit choice, or removes the attribute for "system" (in
+  which case `prefers-color-scheme` decides). Base tokens below are the
+  light palette; dark overrides appear twice, guarded so an explicit choice
+  always wins over the media query.
+*/
+
+:root {
+  /* ---- Surfaces (light, default) ---- */
+  --um-bg: #f2f3f9;
+  --um-surface: #ffffff;
+  --um-surface-container: #f5f6fb;
+  --um-surface-container-high: #eaecf5;
+  --um-surface-container-highest: #dfe2ee;
+  --um-surface-overlay: rgba(255, 255, 255, 0.72);
+  --um-outline: #dcdee9;
+  --um-outline-variant: #e9eaf3;
+
+  /* ---- Text ---- */
+  --um-text: #1a1b22;
+  --um-text-secondary: #5c5f70;
+  --um-text-tertiary: #8b8ea3;
+  --um-text-on-primary: #ffffff;
+  --um-text-disabled: #b3b5c4;
+
+  /* ---- Brand / accent ---- */
+  --um-primary: #3e5cf0;
+  --um-primary-hover: #3450d9;
+  --um-primary-container: #e3e8ff;
+  --um-on-primary-container: #1c2a80;
+  --um-secondary: #7b5cf0;
+  --um-secondary-container: #ece3ff;
+
+  /* ---- Semantic ---- */
+  --um-success: #1c9b6b;
+  --um-success-container: #d9f5e8;
+  --um-warning: #b6790a;
+  --um-warning-container: #fbedd0;
+  --um-danger: #d3402f;
+  --um-danger-container: #fbe0dc;
+  --um-info: #2f7fd3;
+  --um-info-container: #dcecfb;
+
+  /* ---- Code / editor ---- */
+  --um-code-bg: #f0f1f8;
+  --um-code-text: #1a1b22;
+  --um-selection: rgba(62, 92, 240, 0.18);
+
+  /* ---- Elevation (soft, diffuse — One UI style) ---- */
+  --um-elevation-0: none;
+  --um-elevation-1: 0 1px 2px rgba(20, 22, 40, 0.04), 0 1px 1px rgba(20, 22, 40, 0.03);
+  --um-elevation-2: 0 4px 12px rgba(20, 22, 40, 0.07), 0 1px 3px rgba(20, 22, 40, 0.05);
+  --um-elevation-3: 0 10px 28px rgba(20, 22, 40, 0.10), 0 2px 6px rgba(20, 22, 40, 0.06);
+  --um-elevation-4: 0 20px 48px rgba(20, 22, 40, 0.14), 0 4px 10px rgba(20, 22, 40, 0.07);
+
+  /* ---- Radius (generous, One UI style) ---- */
+  --um-radius-xs: 8px;
+  --um-radius-sm: 12px;
+  --um-radius-md: 16px;
+  --um-radius-lg: 22px;
+  --um-radius-xl: 28px;
+  --um-radius-2xl: 36px;
+  --um-radius-full: 999px;
+
+  /* ---- Spacing scale ---- */
+  --um-space-1: 4px;
+  --um-space-2: 8px;
+  --um-space-3: 12px;
+  --um-space-4: 16px;
+  --um-space-5: 20px;
+  --um-space-6: 24px;
+  --um-space-8: 32px;
+  --um-space-10: 40px;
+  --um-space-12: 48px;
+  --um-space-16: 64px;
+
+  /* ---- Typography ---- */
+  --um-font-sans: -apple-system, 'Segoe UI Variable', 'Segoe UI', Roboto, 'Helvetica Neue', system-ui, sans-serif;
+  --um-font-mono: ui-monospace, 'Cascadia Code', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --um-font-size-xs: 12px;
+  --um-font-size-sm: 13.5px;
+  --um-font-size-md: 15px;
+  --um-font-size-lg: 17px;
+  --um-font-size-xl: 20px;
+  --um-font-size-2xl: 26px;
+  --um-font-size-3xl: 34px;
+  --um-font-size-4xl: 44px;
+
+  /* ---- Motion ---- */
+  --um-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --um-ease-decelerate: cubic-bezier(0, 0, 0, 1);
+  --um-ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+  --um-duration-fast: 120ms;
+  --um-duration-normal: 200ms;
+  --um-duration-slow: 320ms;
+
+  /* ---- Layout ---- */
+  --um-topbar-height: 64px;
+  --um-statusbar-height: 32px;
+  --um-explorer-width: 280px;
+  --um-preview-min-width: 320px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --um-bg: #0e0f14;
+    --um-surface: #16171f;
+    --um-surface-container: #1b1c26;
+    --um-surface-container-high: #23242f;
+    --um-surface-container-highest: #2b2d3a;
+    --um-surface-overlay: rgba(22, 23, 31, 0.72);
+    --um-outline: #2f313e;
+    --um-outline-variant: #24262f;
+
+    --um-text: #eef0f8;
+    --um-text-secondary: #a7aabd;
+    --um-text-tertiary: #7d8096;
+    --um-text-on-primary: #ffffff;
+    --um-text-disabled: #52546a;
+
+    --um-primary: #8ba1ff;
+    --um-primary-hover: #a2b4ff;
+    --um-primary-container: #29316e;
+    --um-on-primary-container: #dbe1ff;
+    --um-secondary: #c3b0ff;
+    --um-secondary-container: #382a6e;
+
+    --um-success: #4fd3a0;
+    --um-success-container: #113d2e;
+    --um-warning: #eab35c;
+    --um-warning-container: #493409;
+    --um-danger: #f28b7d;
+    --um-danger-container: #4a1a14;
+    --um-info: #7fb8f2;
+    --um-info-container: #123a5c;
+
+    --um-code-bg: #1c1d27;
+    --um-code-text: #eef0f8;
+    --um-selection: rgba(139, 161, 255, 0.24);
+
+    --um-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.30), 0 1px 1px rgba(0, 0, 0, 0.22);
+    --um-elevation-2: 0 4px 14px rgba(0, 0, 0, 0.36), 0 1px 3px rgba(0, 0, 0, 0.26);
+    --um-elevation-3: 0 12px 32px rgba(0, 0, 0, 0.42), 0 2px 6px rgba(0, 0, 0, 0.28);
+    --um-elevation-4: 0 24px 56px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --um-bg: #0e0f14;
+  --um-surface: #16171f;
+  --um-surface-container: #1b1c26;
+  --um-surface-container-high: #23242f;
+  --um-surface-container-highest: #2b2d3a;
+  --um-surface-overlay: rgba(22, 23, 31, 0.72);
+  --um-outline: #2f313e;
+  --um-outline-variant: #24262f;
+
+  --um-text: #eef0f8;
+  --um-text-secondary: #a7aabd;
+  --um-text-tertiary: #7d8096;
+  --um-text-on-primary: #ffffff;
+  --um-text-disabled: #52546a;
+
+  --um-primary: #8ba1ff;
+  --um-primary-hover: #a2b4ff;
+  --um-primary-container: #29316e;
+  --um-on-primary-container: #dbe1ff;
+  --um-secondary: #c3b0ff;
+  --um-secondary-container: #382a6e;
+
+  --um-success: #4fd3a0;
+  --um-success-container: #113d2e;
+  --um-warning: #eab35c;
+  --um-warning-container: #493409;
+  --um-danger: #f28b7d;
+  --um-danger-container: #4a1a14;
+  --um-info: #7fb8f2;
+  --um-info-container: #123a5c;
+
+  --um-code-bg: #1c1d27;
+  --um-code-text: #eef0f8;
+  --um-selection: rgba(139, 161, 255, 0.24);
+
+  --um-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.30), 0 1px 1px rgba(0, 0, 0, 0.22);
+  --um-elevation-2: 0 4px 14px rgba(0, 0, 0, 0.36), 0 1px 3px rgba(0, 0, 0, 0.26);
+  --um-elevation-3: 0 12px 32px rgba(0, 0, 0, 0.42), 0 2px 6px rgba(0, 0, 0, 0.28);
+  --um-elevation-4: 0 24px 56px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}

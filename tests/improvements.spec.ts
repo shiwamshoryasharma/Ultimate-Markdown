@@ -1,0 +1,150 @@
+import { test, expect, type Page } from '@playwright/test'
+import path from 'node:path'
+import { existsSync } from 'node:fs'
+const corpus = process.env.UM_TEST_CORPUS ?? path.resolve('..', 'documentation')
+test.beforeEach(async ({ page }) => { page.on('console', msg => { if (msg.type() === 'error') console.log('BROWSER', msg.text()) }) })
+test('shared export and sanitization regression harness', async ({ page }) => {
+  await page.goto('/tests/regression.html')
+  await expect(page.locator('#summary')).toContainText(/CHECKS PASSED|FAILURES|ERROR/, { timeout: 30000 })
+  expect(await page.locator('#results li').filter({hasText:/^FAIL/}).allTextContents()).toEqual([])
+  await expect(page.locator('#summary')).toContainText('CHECKS PASSED')
+})
+
+async function fallbackPickers(page: Page) {
+  await page.addInitScript(() => { Object.defineProperty(window, 'showDirectoryPicker', { value: undefined, configurable: true }); Object.defineProperty(window, 'showOpenFilePicker', { value: undefined, configurable: true }) })
+}
+async function folder(page: Page) {
+  await fallbackPickers(page)
+  await page.goto('/')
+  const chooser = page.waitForEvent('filechooser')
+  await page.getByRole('button', { name: 'Open folder', exact: true }).click()
+  await (await chooser).setFiles(corpus)
+  await expect(page).toHaveURL(/workspace/)
+}
+async function pageCount(page: Page) {
+  await expect(page.locator('[role=status]').filter({ hasText: /^\d+ pages?$|Preview unavailable/ })).toBeVisible({ timeout: 60000 })
+  const error = page.getByRole('alert')
+  if (await error.count()) throw new Error(await error.allTextContents().then(t => t.join('\n')))
+  await expect(page.locator('[role=status]').filter({ hasText: /^\d+ pages?$/ })).toBeVisible({ timeout: 60000 })
+  return Number((await page.locator('[role=status]').filter({ hasText: /^\d+ pages?$/ }).innerText()).split(' ')[0])
+}
+
+test('home actions, live example, responsive navigation and compact find/replace', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('link', { name: 'Ultimate Markdown on GitHub' })).toHaveAttribute('href', 'https://github.com/shiwamshoryasharma/Ultimate-Markdown')
+  await page.getByRole('textbox', { name: 'Try Markdown' }).fill('# Search test\n\nAlpha alpha alphabet.\n\n## End')
+  await expect(page.locator('.markdown-content h1')).toHaveText('Search test')
+  await page.getByRole('button', { name: 'Open in editor', exact: true }).click()
+  const editor = page.locator('.cm-content')
+  await editor.click(); await page.keyboard.press('Control+f')
+  await page.getByRole('textbox', { name: 'Find', exact: true }).fill('alpha')
+  await page.keyboard.press('Enter')
+  await expect(page.locator('.um-find-count')).toHaveText('1 of 3')
+  const a = await page.locator('.um-find').boundingBox(), b = await page.locator('.cm-editor').boundingBox()
+  expect(a!.y - b!.y).toBeLessThan(15); expect(a!.height).toBeLessThan(60)
+  await page.getByRole('button', { name: 'Match whole word', exact: true }).click()
+  await expect(page.locator('.um-find-count')).toContainText('of 2')
+  await page.getByRole('textbox', { name: 'Find', exact: true }).focus(); await page.keyboard.press('Control+h')
+  await page.getByRole('textbox', { name: 'Replace', exact: true }).fill('Beta')
+  await page.getByRole('button', { name: 'Replace all', exact: true }).click()
+  await expect(editor).toContainText('Beta Beta alphabet.')
+  await page.getByRole('textbox', { name: 'Find', exact: true }).focus(); await page.keyboard.press('Escape')
+  await expect(page.locator('.um-find')).toHaveCount(0)
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.getByRole('link', { name: 'Home', exact: true }).click()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390)
+  await page.screenshot({ path: '.tmp/home-mobile.png' })
+  await page.getByRole('button', { name: /Markdown to PDF/ }).click()
+  await expect(page.getByRole('button', { name: 'PDF', exact: true })).toHaveAttribute('aria-pressed', 'true')
+})
+
+test('single file images can be connected without losing edits or following linked documents', async ({ page }) => {
+  test.skip(!existsSync(corpus), 'Set UM_TEST_CORPUS to the read-only documentation folder.')
+  await fallbackPickers(page); await page.goto('/')
+  const chooser = page.waitForEvent('filechooser'); await page.getByRole('button', { name: 'Open Markdown', exact: true }).click()
+  await (await chooser).setFiles(path.join(corpus, '03-factory-home.md'))
+  await expect(page.getByRole('button', { name: 'Connect image folder', exact: true })).toBeVisible()
+  const next = page.waitForEvent('filechooser'); await page.getByRole('button', { name: 'Connect image folder', exact: true }).click()
+  await (await next).setFiles(corpus)
+  await expect(page.locator('.markdown-content img').first()).toBeVisible()
+  expect(await page.locator('.markdown-content img').first().evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBeTruthy()
+  await page.getByRole('link', { name: 'Converter', exact: true }).click()
+  await expect(page.getByText('1 document in export order')).toBeVisible({ timeout: 30000 })
+  expect(await pageCount(page)).toBeGreaterThan(1)
+  const frame = page.frameLocator('iframe[title="Paginated export preview"]')
+  await expect(frame.locator('img').first()).toBeVisible()
+})
+
+test('broken links are repaired once; real manual paginates with themes and 1–3 columns', async ({ page }) => {
+  test.skip(!existsSync(corpus), 'Set UM_TEST_CORPUS to the read-only documentation folder.')
+  await folder(page)
+  await page.getByRole('link', { name: 'Converter', exact: true }).click()
+  await page.getByRole('button', { name: 'PDF', exact: true }).click()
+  const repair = page.getByRole('combobox', { name: 'Replacement for 03-factory-brain.md from 01-introduction.md' })
+  await expect(repair).toBeVisible({ timeout: 30000 })
+  await expect(repair).toHaveValue('02-system-overview.md')
+  await expect(page.getByText('4 documents in export order')).toBeVisible()
+  // Remove a mapping to exercise the generic repair flow as well as the approved profile.
+  await repair.selectOption('')
+  await expect(page.getByRole('heading', {name:'Choose where the manual continues'})).toBeVisible()
+  await repair.selectOption('02-system-overview.md')
+  const second = page.getByRole('combobox', { name: 'Replacement for 04-factory-brain.md from 03-factory-home.md' })
+  await expect(second).toBeVisible({ timeout: 30000 }); await second.selectOption('04-getting-started.md')
+  const third = page.getByRole('combobox', { name: 'Replacement for 05-factory-brain.md from 04-getting-started.md' })
+  await expect(third).toBeVisible({ timeout: 30000 }); await third.selectOption('__stop__')
+  await expect(page.getByText('4 documents in export order')).toBeVisible()
+  const count = await pageCount(page); expect(count).toBeGreaterThan(4)
+  const preview = page.frameLocator('iframe[title="Paginated export preview"]')
+  expect(await preview.locator('.pagedjs_page').count()).toBe(count)
+  await page.getByRole('button', { name: 'Design', exact: true }).click()
+  await page.getByRole('button', { name: 'Parchment theme' }).click()
+  await pageCount(page)
+  await expect(preview.locator('.pagedjs_page').first()).toHaveCSS('background-color', 'rgb(255, 248, 220)')
+  await page.getByRole('spinbutton', { name: 'Heading 1 (pt)', exact: true }).fill('14')
+  await pageCount(page)
+  await expect(preview.locator('h1').first()).toHaveCSS('font-size', '18.6667px')
+  for (const columns of [2, 3]) {
+    await page.evaluate(async (columns) => { const { useConversionStore } = await import('/src/stores/conversionStore.ts'); useConversionStore.getState().update({ columns }) }, columns)
+    await pageCount(page)
+    await expect(preview.locator('.export-section').first()).toHaveCSS('column-count', String(columns))
+    const content = await preview.locator('.pagedjs_pages').innerText()
+    expect(content).toContain('Before Moving Forward')
+  }
+  await page.screenshot({ path: '.tmp/manual-columns.png' })
+})
+
+test('synthetic page boundaries produce four pages plus two pages, with selectable PDF text', async ({ page }) => {
+  await page.goto('/')
+  await page.evaluate(async () => {
+    const sections = (letter: string, n: number) => Array.from({ length: n }, (_, i) => `<div style="${i ? 'break-before:page;' : ''}"><h1>${letter} page ${i + 1}</h1><p>Selectable ${letter} content ${i + 1}.</p></div>`).join('\n\n')
+    const entries = [['A.md', sections('A', 4) + '\n\n**Previous:** [A](A.md) || **Next:** [B](B.md)'], ['B.md', sections('B', 2) + '\n\n[Next](A.md)']]
+    const transfer = new DataTransfer()
+    entries.forEach(([name, content]) => { const file = new File([content], name); Object.defineProperty(file, 'webkitRelativePath', { value: 'Synthetic/' + name }); transfer.items.add(file) })
+    document.querySelector('textarea')!.dispatchEvent(new DragEvent('drop', { bubbles: true, dataTransfer: transfer }))
+  })
+  await expect(page).toHaveURL(/workspace/)
+  await page.getByRole('link', { name: 'Converter', exact: true }).click()
+  expect(await pageCount(page)).toBe(6)
+  const frame = page.frameLocator('iframe[title="Paginated export preview"]')
+  for (let i = 0; i < 6; i++) await expect(frame.locator('.pagedjs_page').nth(i)).toContainText(i < 4 ? `A page ${i + 1}` : `B page ${i - 3}`)
+  await expect(page.getByRole('button', { name: 'Print / Save PDF' })).toBeEnabled()
+  const html = await frame.locator('html').evaluate((root) => { const clone = root.cloneNode(true) as HTMLElement; clone.querySelectorAll('script').forEach(el => el.remove()); return '<!DOCTYPE html>' + clone.outerHTML })
+  const printPage = await page.context().newPage()
+  await printPage.setContent(html)
+  const pdf = await printPage.pdf({ preferCSSPageSize: true, printBackground: true, path: '.tmp/six-pages.pdf' })
+  expect(pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)?.length).toBe(6)
+  await printPage.close()
+  const extraction = await page.evaluate(async (data) => {
+    const pdfjs = await import('/node_modules/pdfjs-dist/build/pdf.mjs')
+    pdfjs.GlobalWorkerOptions.workerSrc = '/node_modules/pdfjs-dist/build/pdf.worker.mjs'
+    const task = pdfjs.getDocument({ data: new Uint8Array(data) })
+    const doc = await task.promise
+    const pages = []
+    for (let n = 1; n <= doc.numPages; n++) pages.push((await (await doc.getPage(n)).getTextContent()).items.map(item => 'str' in item ? item.str : '').join(' '))
+    await task.destroy()
+    return pages
+  }, Array.from(pdf))
+  expect(extraction).toHaveLength(6)
+  expect(extraction[0]).toContain('Selectable A content 1')
+  expect(extraction[5]).toContain('Selectable B content 2')
+})

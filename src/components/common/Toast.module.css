@@ -1,0 +1,22 @@
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--um-space-3);
+  padding: var(--um-space-3) var(--um-space-4);
+  background: var(--um-danger-container);
+  color: var(--um-danger);
+  border-radius: var(--um-radius-lg);
+  box-shadow: var(--um-elevation-2);
+  font-size: var(--um-font-size-sm);
+  font-weight: 500;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.message {
+  flex: 1 1 auto;
+}

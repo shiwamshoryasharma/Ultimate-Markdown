@@ -1,0 +1,35 @@
+.wrapper {
+  margin: var(--um-space-5) 0;
+  border-radius: var(--um-radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--um-outline-variant);
+  background: var(--um-code-bg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--um-space-2) var(--um-space-3);
+  background: var(--um-surface-container-high);
+  border-bottom: 1px solid var(--um-outline-variant);
+}
+
+.language {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--um-text-tertiary);
+}
+
+.pre {
+  margin: 0;
+  padding: var(--um-space-4);
+  overflow-x: auto;
+  font-family: var(--um-font-mono);
+  font-size: var(--um-font-size-sm);
+  line-height: 1.6;
+  color: var(--um-code-text);
+  background: transparent;
+}

@@ -1,0 +1,24 @@
+.resizer {
+  flex: 0 0 auto;
+  width: 9px;
+  margin: 0 -4px;
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  touch-action: none;
+}
+
+.grip {
+  width: 3px;
+  height: 40px;
+  border-radius: var(--um-radius-full);
+  background: var(--um-outline);
+  transition: background-color var(--um-duration-fast) var(--um-ease-standard), height var(--um-duration-fast) var(--um-ease-standard);
+}
+
+.resizer:hover .grip {
+  background: var(--um-primary);
+  height: 64px;
+}

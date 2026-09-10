@@ -1,0 +1,71 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--um-space-2);
+  width: 100%;
+  height: 34px;
+  padding-right: var(--um-space-3);
+  border: none;
+  background: transparent;
+  color: var(--um-text-secondary);
+  font-size: var(--um-font-size-sm);
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--um-radius-sm);
+  transition: background-color var(--um-duration-fast) var(--um-ease-standard), color var(--um-duration-fast) var(--um-ease-standard);
+}
+
+.row:hover {
+  background: var(--um-surface-container-high);
+  color: var(--um-text);
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1 1 auto;
+}
+
+.fileIcon,
+.folderIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--um-text-tertiary);
+}
+
+.chevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--um-text-tertiary);
+  transition: transform var(--um-duration-fast) var(--um-ease-standard);
+}
+
+.chevronOpen {
+  transform: rotate(90deg);
+}
+
+.folderRow {
+  font-weight: 600;
+  color: var(--um-text);
+}
+
+.active {
+  background: var(--um-primary-container);
+  color: var(--um-on-primary-container);
+  font-weight: 600;
+}
+
+.active .fileIcon {
+  color: var(--um-on-primary-container);
+}
+
+.dirtyDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--um-warning);
+  flex-shrink: 0;
+}

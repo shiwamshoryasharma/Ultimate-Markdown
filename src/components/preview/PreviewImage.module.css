@@ -1,0 +1,33 @@
+.image {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--um-radius-md);
+  display: block;
+  margin: var(--um-space-4) auto;
+}
+
+.missing {
+  flex-wrap: wrap;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--um-space-2);
+  padding: var(--um-space-2) var(--um-space-3);
+  border-radius: var(--um-radius-sm);
+  background: var(--um-warning-container);
+  color: var(--um-warning);
+  font-size: var(--um-font-size-sm);
+  font-weight: 600;
+}
+.missing button{border:1px solid currentColor;border-radius:8px;background:transparent;color:inherit;font:inherit;padding:6px 10px;cursor:pointer}
+
+.missing svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.placeholder {
+  display: inline-block;
+  width: 100%;
+  height: 1px;
+}

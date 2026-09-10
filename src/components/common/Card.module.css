@@ -1,0 +1,53 @@
+.card {
+  background: var(--um-surface);
+  border-radius: var(--um-radius-xl);
+  box-shadow: var(--um-elevation-1);
+  border: 1px solid var(--um-outline-variant);
+}
+
+.elevated {
+  box-shadow: var(--um-elevation-2);
+}
+
+.interactive {
+  cursor: pointer;
+  transition: box-shadow var(--um-duration-normal) var(--um-ease-standard),
+    transform var(--um-duration-normal) var(--um-ease-standard),
+    border-color var(--um-duration-normal) var(--um-ease-standard);
+}
+
+.interactive:hover {
+  box-shadow: var(--um-elevation-3);
+  border-color: transparent;
+  transform: translateY(-2px);
+}
+
+.interactive:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.cardButton {
+  display: flex;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: box-shadow var(--um-duration-normal) var(--um-ease-standard),
+    transform var(--um-duration-normal) var(--um-ease-standard),
+    border-color var(--um-duration-normal) var(--um-ease-standard);
+}
+
+.cardButton:hover {
+  box-shadow: var(--um-elevation-3);
+  border-color: transparent;
+  transform: translateY(-2px);
+}
+
+.cardButton:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.cardButton:focus-visible {
+  outline: 2px solid var(--um-primary);
+  outline-offset: 2px;
+}

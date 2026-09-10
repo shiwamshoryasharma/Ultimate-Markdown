@@ -1,0 +1,113 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--um-font-sans);
+  font-size: var(--um-font-size-md);
+  line-height: 1.55;
+  color: var(--um-text);
+  background: var(--um-bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--um-font-sans);
+  font-weight: 600;
+  color: var(--um-text);
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: var(--um-selection);
+}
+
+/* Slim, unobtrusive scrollbars in the One UI spirit */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--um-outline) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--um-outline);
+  border-radius: var(--um-radius-full);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--um-text-tertiary);
+  background-clip: padding-box;
+}
+
+:focus-visible {
+  outline: 2px solid var(--um-primary);
+  outline-offset: 2px;
+}
+
+a {
+  color: var(--um-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+/* Theme-owned form controls, including keyboard and high-contrast states. */
+input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea{appearance:none;background:var(--um-surface-container);color:var(--um-text);border:1px solid var(--um-outline-variant);border-radius:10px;caret-color:var(--um-primary);transition:border-color .15s,box-shadow .15s}
+input:not([type=checkbox]):not([type=radio]):focus-visible,textarea:focus-visible{outline:2px solid var(--um-primary);outline-offset:2px}
+input[type=number]{appearance:textfield;-moz-appearance:textfield}
+input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=checkbox]{appearance:none;-webkit-appearance:none;display:inline-grid;place-content:center;vertical-align:middle;width:18px;height:18px;border:1.5px solid var(--um-outline);border-radius:5px;background:var(--um-surface-container);cursor:pointer;flex-shrink:0;transition:background .15s,border-color .15s}
+input[type=checkbox]:checked{background:var(--um-primary);border-color:var(--um-primary)}
+input[type=checkbox]:checked::after{content:'';display:block;width:8px;height:4px;border-left:2px solid var(--um-on-primary);border-bottom:2px solid var(--um-on-primary);transform:rotate(-45deg) translateY(-1px)}
+input[type=checkbox]:focus-visible{outline:2px solid var(--um-primary);outline-offset:3px}
+input[type=checkbox]:disabled{cursor:default}
+*{scrollbar-width:thin;scrollbar-color:var(--um-outline) transparent}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--um-outline);border:2px solid transparent;background-clip:padding-box;border-radius:20px}::-webkit-scrollbar-thumb:hover{background:var(--um-text-secondary);border:2px solid transparent;background-clip:padding-box}
+@media(forced-colors:active){input[type=checkbox]{appearance:auto}button:focus-visible{outline:2px solid Highlight}}

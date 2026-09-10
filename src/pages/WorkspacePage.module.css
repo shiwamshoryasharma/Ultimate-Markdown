@@ -1,0 +1,193 @@
+.page {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.workspace {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.explorerContainer {
+  flex: 0 0 auto;
+  height: 100%;
+  min-width: 200px;
+  max-width: 480px;
+}
+
+.mobilePane {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.center {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--um-surface);
+}
+
+.emptyActions {
+  display: flex;
+  gap: var(--um-space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.splitArea {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+}
+
+.editorPane {
+  flex: 0 0 auto;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.previewPane {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--um-surface);
+}
+
+.tocContainer {
+  flex: 0 0 260px;
+  height: 100%;
+  border-left: 1px solid var(--um-outline-variant);
+  background: var(--um-surface-container);
+}
+
+.dropOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--um-surface-overlay);
+  backdrop-filter: blur(6px);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.dropCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--um-space-2);
+  padding: var(--um-space-8) var(--um-space-12);
+  border-radius: var(--um-radius-2xl);
+  border: 2px dashed var(--um-primary);
+  background: var(--um-primary-container);
+  color: var(--um-on-primary-container);
+  font-weight: 600;
+}
+
+.dropIcon {
+  width: 32px;
+  height: 32px;
+}
+
+.toastStack {
+  position: absolute;
+  bottom: var(--um-space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--um-space-2);
+  z-index: 30;
+  max-width: 90%;
+}
+
+.mobileTabs {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  height: 60px;
+  background: var(--um-surface);
+  border-top: 1px solid var(--um-outline-variant);
+}
+
+.mobileTab,
+.mobileTabActive {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mobileTab {
+  color: var(--um-text-tertiary);
+}
+
+.mobileTabActive {
+  color: var(--um-primary);
+}
+
+.mobileTab svg,
+.mobileTabActive svg {
+  width: 20px;
+  height: 20px;
+}
+
+.mobileTocFab {
+  position: absolute;
+  bottom: var(--um-space-5);
+  right: var(--um-space-5);
+  box-shadow: var(--um-elevation-3);
+}
+
+.readerRoot {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  overflow: hidden;
+}
+
+.readerScroll {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  background: var(--um-surface);
+}
+
+.readerToc {
+  flex: 0 0 260px;
+  height: 100%;
+  border-left: 1px solid var(--um-outline-variant);
+  background: var(--um-surface-container);
+}
+
+@media (max-width: 720px) {
+  .tocContainer,
+  .readerToc {
+    display: none;
+  }
+}

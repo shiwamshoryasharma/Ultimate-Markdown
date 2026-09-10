@@ -1,0 +1,69 @@
+.panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--um-surface-container);
+  border-right: 1px solid var(--um-outline-variant);
+}
+
+.header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--um-space-2);
+  height: 52px;
+  padding: 0 var(--um-space-2) 0 var(--um-space-4);
+}
+
+.title {
+  font-size: var(--um-font-size-sm);
+  font-weight: 700;
+  color: var(--um-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchBox {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--um-space-2);
+  margin: 0 var(--um-space-3) var(--um-space-2);
+  padding: 0 var(--um-space-3);
+  height: 36px;
+  background: var(--um-surface);
+  border: 1px solid var(--um-outline-variant);
+  border-radius: var(--um-radius-full);
+}
+
+.searchIcon {
+  width: 15px;
+  height: 15px;
+  color: var(--um-text-tertiary);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: var(--um-font-size-sm);
+  color: var(--um-text);
+}
+
+.searchInput::placeholder {
+  color: var(--um-text-tertiary);
+}
+
+.treeScroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 var(--um-space-2) var(--um-space-4);
+}

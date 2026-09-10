@@ -1,0 +1,79 @@
+/* Custom highlight.js token colors mapped onto the app's design tokens, so
+   code blocks match the theme automatically in light and dark instead of
+   using one of highlight.js's fixed bundled stylesheets. */
+
+.hljs {
+  color: var(--um-code-text);
+  background: transparent;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: var(--um-text-tertiary);
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-subst,
+.hljs-doctag {
+  color: var(--um-primary);
+  font-weight: 600;
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition {
+  color: var(--um-success);
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet {
+  color: var(--um-warning);
+}
+
+.hljs-title,
+.hljs-title.function_,
+.hljs-title.class_,
+.hljs-section {
+  color: var(--um-secondary);
+  font-weight: 600;
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type {
+  color: var(--um-info);
+}
+
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-tag {
+  color: var(--um-danger);
+}
+
+.hljs-built_in,
+.hljs-builtin-name {
+  color: var(--um-secondary);
+}
+
+.hljs-deletion {
+  color: var(--um-danger);
+}
+
+.hljs-meta {
+  color: var(--um-text-tertiary);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 700;
+}

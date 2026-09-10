@@ -1,0 +1,22 @@
+.bar {
+  flex: 0 0 auto;
+  height: var(--um-statusbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--um-space-4);
+  padding: 0 var(--um-space-4);
+  background: var(--um-surface-container);
+  border-top: 1px solid var(--um-outline-variant);
+  font-size: var(--um-font-size-xs);
+  color: var(--um-text-tertiary);
+}
+
+.side {
+  display: flex;
+  align-items: center;
+  gap: var(--um-space-4);
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}

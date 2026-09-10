@@ -1,0 +1,107 @@
+.root {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.scroll {
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--um-space-8) var(--um-space-8) var(--um-space-16);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.pageTitle {
+  font-size: var(--um-font-size-3xl);
+  font-weight: 700;
+  margin-bottom: var(--um-space-8);
+}
+
+.section {
+  background: var(--um-surface);
+  border: 1px solid var(--um-outline-variant);
+  border-radius: var(--um-radius-xl);
+  padding: var(--um-space-2) var(--um-space-6);
+  margin-bottom: var(--um-space-6);
+}
+
+.sectionTitle {
+  font-size: var(--um-font-size-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--um-text-tertiary);
+  padding: var(--um-space-4) 0 var(--um-space-2);
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--um-space-4);
+  padding: var(--um-space-4) 0;
+  border-top: 1px solid var(--um-outline-variant);
+  cursor: default;
+}
+
+.section > .field:first-of-type {
+  border-top: none;
+}
+
+.fieldText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.fieldLabel {
+  font-size: var(--um-font-size-md);
+  font-weight: 600;
+  color: var(--um-text);
+}
+
+.fieldDescription {
+  font-size: var(--um-font-size-xs);
+  color: var(--um-text-tertiary);
+}
+
+.fieldControl {
+  flex-shrink: 0;
+}
+
+.numberInput {
+  width: 72px;
+  height: 38px;
+  padding: 0 var(--um-space-3);
+  border-radius: var(--um-radius-md);
+  border: 1px solid var(--um-outline);
+  background: var(--um-surface-container);
+  color: var(--um-text);
+  font-size: var(--um-font-size-sm);
+  text-align: center;
+}
+
+.select {
+  height: 38px;
+  padding: 0 var(--um-space-3);
+  border-radius: var(--um-radius-md);
+  border: 1px solid var(--um-outline);
+  background: var(--um-surface-container);
+  color: var(--um-text);
+  font-size: var(--um-font-size-sm);
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--um-primary);
+  cursor: pointer;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--um-space-4);
+}

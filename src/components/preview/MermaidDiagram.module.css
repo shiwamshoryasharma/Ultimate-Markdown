@@ -1,0 +1,66 @@
+.diagram {
+  display: flex;
+  justify-content: center;
+  padding: var(--um-space-5);
+  margin: var(--um-space-5) 0;
+  background: var(--um-surface-container);
+  border-radius: var(--um-radius-lg);
+  border: 1px solid var(--um-outline-variant);
+  overflow-x: auto;
+}
+
+.diagram :global(svg) {
+  max-width: 100%;
+  height: auto;
+}
+
+.loading {
+  padding: var(--um-space-6);
+  margin: var(--um-space-5) 0;
+  text-align: center;
+  color: var(--um-text-tertiary);
+  font-size: var(--um-font-size-sm);
+  background: var(--um-surface-container);
+  border-radius: var(--um-radius-lg);
+}
+
+.error {
+  margin: var(--um-space-5) 0;
+  padding: var(--um-space-5);
+  border-radius: var(--um-radius-lg);
+  background: var(--um-danger-container);
+  border: 1px solid var(--um-danger);
+}
+
+.errorTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--um-space-2);
+  color: var(--um-danger);
+  font-weight: 700;
+  font-size: var(--um-font-size-sm);
+  margin-bottom: var(--um-space-2);
+}
+
+.errorTitle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.errorMessage {
+  font-size: var(--um-font-size-sm);
+  color: var(--um-danger);
+  margin-bottom: var(--um-space-3);
+}
+
+.errorSource {
+  margin: 0;
+  padding: var(--um-space-3);
+  background: var(--um-surface);
+  border-radius: var(--um-radius-sm);
+  font-family: var(--um-font-mono);
+  font-size: var(--um-font-size-sm);
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--um-text);
+}

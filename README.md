@@ -13,12 +13,26 @@ A Markdown workspace that turns your notes and linked manuals into documents rea
 ![Browser only](https://img.shields.io/badge/Processing-In_your_browser-16a085)
 [![Non-commercial](https://img.shields.io/badge/License-Non--Commercial-f59e0b)](LICENSE)
 
-[🌐 Visit Website][website] · [🔗 Alternative Domain][mirror] · [🌍 Backup Domain][backup] · [🐛 Report an Issue](https://github.com/shiwamshoryasharma/Ultimate-Markdown/issues)
+[![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Visit-181717?style=for-the-badge&logo=github&logoColor=white)][github-pages]
+[![Firebase web.app](https://img.shields.io/badge/Firebase-web.app-DD2C00?style=for-the-badge&logo=firebase&logoColor=white)][firebase-web]
+[![Firebase firebaseapp.com](https://img.shields.io/badge/Firebase-firebaseapp.com-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)][firebase-app]
+[![Netlify](https://img.shields.io/badge/Netlify-Visit-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)][netlify]
+[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare_Workers-Visit-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)][cloudflare]
+
+[🐛 Report an Issue](https://github.com/shiwamshoryasharma/Ultimate-Markdown/issues)
 
 </div>
 
 > [!NOTE]
-> **The website and alternative domain are live on Firebase Hosting.** The backup domain is a placeholder. All three addresses are defined at the bottom of this README for easy editing.
+> **Choose a hosting domain below to open the web app.** All five addresses are defined at the bottom of this README for easy editing.
+
+| Hosting provider | Website |
+| :--- | :--- |
+| GitHub Pages | [shiwamshoryasharma.github.io/Ultimate-Markdown][github-pages] |
+| Firebase Hosting · primary | [ultimate-markdown.web.app][firebase-web] |
+| Firebase Hosting · alternative | [ultimate-markdown.firebaseapp.com][firebase-app] |
+| Netlify | [ultimate-markdown.netlify.app][netlify] |
+| Cloudflare Workers | [ultimate-markdown.shiwamshoryasharma.workers.dev][cloudflare] |
 
 ![Ultimate Markdown Home with quick actions and colourful export cards](readme_assets/HOME.png)
 
@@ -213,7 +227,7 @@ The included [Pages workflow](.github/workflows/pages.yml) publishes the **commi
 > [!IMPORTANT]
 > GitHub Pages' **Deploy from a branch** selector only supports the repository root or `/docs`; it cannot select `/web`. Use the included Actions workflow to publish `web`. See [GitHub's publishing-source documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 
-For this repository, the expected default Pages address is `https://shiwamshoryasharma.github.io/Ultimate-Markdown/` once Pages is enabled and a deployment succeeds. Replace the backup placeholder below with another deployed URL when available. Placeholder addresses do not configure hosting or DNS.
+The repository's Pages address is [shiwamshoryasharma.github.io/Ultimate-Markdown][github-pages]. Hosting links are maintained at the bottom of this README; changing a link does not configure hosting or DNS.
 
 ### Firebase Hosting
 
@@ -269,11 +283,13 @@ Created by [Shiwam Shorya Sharma](https://github.com/shiwamshoryasharma). For co
 
 <div align="center">
 
-[Visit Website][website] · [Alternative Domain][mirror] · [Backup Domain][backup] · [Back to top](#ultimate-markdown)
+[GitHub Pages][github-pages] · [Firebase web.app][firebase-web] · [Firebase alternative][firebase-app] · [Netlify][netlify] · [Cloudflare Workers][cloudflare] · [Back to top](#ultimate-markdown)
 
 </div>
 
-<!-- HOSTING LINKS: update live URLs here; replace the backup placeholder when hosted. -->
-[website]: https://ultimate-markdown.web.app/
-[mirror]: https://ultimate-markdown.firebaseapp.com/
-[backup]: https://ultimate-markdown-backup.example/
+<!-- HOSTING LINKS: update provider URLs here. -->
+[github-pages]: https://shiwamshoryasharma.github.io/Ultimate-Markdown/
+[firebase-web]: https://ultimate-markdown.web.app/
+[firebase-app]: https://ultimate-markdown.firebaseapp.com/
+[netlify]: https://ultimate-markdown.netlify.app/
+[cloudflare]: https://ultimate-markdown.shiwamshoryasharma.workers.dev/

@@ -18,7 +18,7 @@ A Markdown workspace that turns your notes and linked manuals into documents rea
 </div>
 
 > [!NOTE]
-> **Website links are placeholders.** The maintainer will replace them after hosting. All three addresses are defined at the bottom of this README for easy editing.
+> **The website and alternative domain are live on Firebase Hosting.** The backup domain is a placeholder. All three addresses are defined at the bottom of this README for easy editing.
 
 ![Ultimate Markdown Home with quick actions and colourful export cards](readme_assets/HOME.png)
 
@@ -213,7 +213,21 @@ The included [Pages workflow](.github/workflows/pages.yml) publishes the **commi
 > [!IMPORTANT]
 > GitHub Pages' **Deploy from a branch** selector only supports the repository root or `/docs`; it cannot select `/web`. Use the included Actions workflow to publish `web`. See [GitHub's publishing-source documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 
-For this repository, the expected default Pages address is `https://shiwamshoryasharma.github.io/Ultimate-Markdown/` once Pages is enabled and a deployment succeeds. Replace the website placeholders below with your actual deployed URLs. Placeholder addresses do not configure hosting or DNS.
+For this repository, the expected default Pages address is `https://shiwamshoryasharma.github.io/Ultimate-Markdown/` once Pages is enabled and a deployment succeeds. Replace the backup placeholder below with another deployed URL when available. Placeholder addresses do not configure hosting or DNS.
+
+### Firebase Hosting
+
+Live: [ultimate-markdown.web.app](https://ultimate-markdown.web.app/) · [ultimate-markdown.firebaseapp.com](https://ultimate-markdown.firebaseapp.com/)
+
+The configuration publishes `web/` to Hosting site **`ultimate-markdown`**, inside Firebase project **`ultimate-markdown`** (display name **Ultimate-Markdown**). To deploy an update using the Firebase CLI:
+
+```sh
+firebase login
+npm run build
+firebase deploy --only hosting --project ultimate-markdown --config firebase.json
+```
+
+Keep the explicit project flag. This deploys Hosting only; it does not deploy databases, rules, or functions. No Firebase SDK initialization is required for this static app.
 
 ### Check the build
 
@@ -259,7 +273,7 @@ Created by [Shiwam Shorya Sharma](https://github.com/shiwamshoryasharma). For co
 
 </div>
 
-<!-- HOSTING LINKS: replace these three placeholder URLs after deployment. -->
-[website]: https://ultimate-markdown.example/
-[mirror]: https://ultimate-markdown-mirror.example/
+<!-- HOSTING LINKS: update live URLs here; replace the backup placeholder when hosted. -->
+[website]: https://ultimate-markdown.web.app/
+[mirror]: https://ultimate-markdown.firebaseapp.com/
 [backup]: https://ultimate-markdown-backup.example/

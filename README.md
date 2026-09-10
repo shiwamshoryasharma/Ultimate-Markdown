@@ -249,6 +249,12 @@ The owner's verification file is kept in `public/google12dac00c9b91bd8b.html`. E
 
 For the `https://ultimate-markdown.web.app/` URL-prefix property, choose **HTML file** verification and click **Verify** after deployment. Keep the file's name and content unchanged. Google checks this file at the website root, independently of the app's interface.
 
+### Sitemap
+
+[sitemap.xml](https://ultimate-markdown.web.app/sitemap.xml) lists the public Firebase homepage. [robots.txt](https://ultimate-markdown.web.app/robots.txt) allows crawling and points to the sitemap. Both files live in `public/` and are included in every build.
+
+In Google Search Console, open the `https://ultimate-markdown.web.app/` property, select **Sitemaps**, enter `sitemap.xml`, and submit. The app's `#/workspace`, `#/converter`, and `#/settings` views are hash routes within the same page, so they are not listed as separate sitemap URLs. Local Markdown documents are never published or included in the sitemap.
+
 ### Check the build
 
 ```sh

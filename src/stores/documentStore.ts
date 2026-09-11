@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { FileNode } from '@/types/filesystem'
-import type { OpenDocument } from '@/types/document'
+import { isDocumentDirty, type OpenDocument } from '@/types/document'
 import {
   UnsupportedFeatureError,
   canSaveInPlace,
@@ -25,6 +25,7 @@ interface DocumentState {
   createNewDocument: () => string
   setActiveDocument: (id: string) => void
   updateContent: (id: string, content: string) => void
+  renameDocument: (id: string, name: string) => string | null
   closeDocument: (id: string) => void
   saveDocument: (id: string) => Promise<SaveResult>
   saveDocumentAs: (id: string) => Promise<SaveAsResult>
@@ -57,6 +58,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
           node,
           content,
           originalContent: content,
+          originalName: node.name,
           loadedAt: Date.now(),
           isNew: false,
         })
@@ -88,6 +90,23 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
 
   setActiveDocument: (id) => set({ activeId: id }),
 
+  renameDocument: (id, value) => {
+    let name=value.trim()
+    if (!name || /[<>:"/\\|?*]/.test(name) || [...name].some(char=>char.charCodeAt(0)<32) || /[. ]$/.test(name) || /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(name)) return 'Enter a valid filename without slashes or reserved characters.'
+    if (!/\.(md|markdown|txt)$/i.test(name)) name+='.md'
+    if (name.length>180) return 'Use a filename under 180 characters.'
+    set(state=>{
+      const doc=state.documents.get(id)
+      if(!doc) return state
+      const documents=new Map(state.documents)
+      // Keep the original path/handle for local resource resolution. A renamed
+      // file gets its new name through Save As, never by silently moving sources.
+      documents.set(id,{...doc,originalName:doc.originalName??doc.node.name,node:{...doc.node,name,extension:name.split('.').at(-1)!.toLowerCase(),path:doc.isNew?name:doc.node.path}})
+      return {documents}
+    })
+    return null
+  },
+
   updateContent: (id, content) =>
     set((state) => {
       const doc = state.documents.get(id)
@@ -109,14 +128,14 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   saveDocument: async (id) => {
     const doc = get().documents.get(id)
     if (!doc) return 'error'
-    if (!canSaveInPlace(doc.node)) return 'unsupported'
+    if (!canSaveInPlace(doc.node) || doc.originalName && doc.node.name !== doc.originalName) return 'unsupported'
     set({ saving: true, error: null })
     try {
       await writeFileText(doc.node, doc.content)
       set((state) => {
         const documents = new Map(state.documents)
         const current = documents.get(id)
-        if (current) documents.set(id, { ...current, originalContent: current.content, isNew: false })
+        if (current) documents.set(id, { ...current, originalContent: doc.content, originalName:doc.node.name, isNew: false })
         return { documents, saving: false }
       })
       return 'saved'
@@ -141,9 +160,10 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
         documents.delete(id)
         documents.set(newNode.id, {
           id: newNode.id,
-          node: newNode,
+          node: {...newNode,embeddedAssets:doc.node.embeddedAssets},
           content: doc.content,
           originalContent: doc.content,
+          originalName: newNode.name,
           loadedAt: Date.now(),
           isNew: false,
         })
@@ -165,12 +185,12 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
 
   isDirty: (id) => {
     const doc = get().documents.get(id)
-    return !!doc && doc.content !== doc.originalContent
+    return !!doc && isDocumentDirty(doc)
   },
 
   hasAnyUnsaved: () => {
     for (const doc of get().documents.values()) {
-      if (doc.content !== doc.originalContent) return true
+      if (isDocumentDirty(doc)) return true
     }
     return false
   },

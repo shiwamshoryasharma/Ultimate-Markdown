@@ -1,5 +1,5 @@
 import { memo, useId, useMemo } from 'react'
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown, { defaultUrlTransform } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkBreaks from 'remark-breaks'
 import remarkMath from 'remark-math'
@@ -53,6 +53,11 @@ function headingIds() {
   }
 }
 const components = { pre: CodeBlock, img: PreviewImage, table: PreviewTable, a: PreviewLink, nav: DocumentNavigation, video: PreviewVideo, audio: PreviewAudio, source: PreviewSource }
+function previewUrl(url: string, key: string, node: Element) {
+  // Imported raster images are embedded locally. Never permit data URLs on links.
+  if (key === 'src' && node.tagName === 'img' && /^data:image\/(png|jpeg|gif|webp);base64,[a-z0-9+/=\s]+$/i.test(url)) return url
+  return defaultUrlTransform(url)
+}
 function MarkdownPreviewImpl({ content, documentPath, workspace, navigationWorkspace = workspace, onNavigateToDocument, fontSize = 16, contentWidth = 'comfortable', className }: MarkdownPreviewProps) {
   const id = 'preview-' + useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const plugins = useMemo<NonNullable<Parameters<typeof ReactMarkdown>[0]['rehypePlugins']>>(() => [
@@ -61,7 +66,7 @@ function MarkdownPreviewImpl({ content, documentPath, workspace, navigationWorks
   ], [id])
   return <PreviewContextProvider value={{ documentPath, workspace, navigationWorkspace, onNavigateToDocument }}>
     <div id={id} className={clsx('markdown-content', styles.content, styles[contentWidth], className)} style={{ fontSize: fontSize + 'px' }}>
-      <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={plugins} components={components}>{content}</ReactMarkdown>
+      <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={plugins} components={components} urlTransform={previewUrl}>{content}</ReactMarkdown>
     </div>
   </PreviewContextProvider>
 }

@@ -10,5 +10,6 @@ export const router = createRouter([
   { path: '/', element: <HomePage /> },
   { path: '/workspace', element: <WorkspacePage /> },
   { path: '/converter', element: <ConverterPage /> },
+  { path: '/import', hydrateFallbackElement: <p role="status">Opening import…</p>, lazy: async () => ({ Component: (await import('@/pages/ImportPage')).ImportPage }) },
   { path: '/settings', element: <SettingsPage /> },
 ])

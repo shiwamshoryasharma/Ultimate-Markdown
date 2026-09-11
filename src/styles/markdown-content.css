@@ -121,6 +121,25 @@
   border-radius: 0;
 }
 
+/* Source manuals often carry light-only CSS, including inline backgrounds.
+   Reading follows the application theme; export styles live in separate frames. */
+:root[data-resolved-theme='dark'] .markdown-content,
+:root[data-resolved-theme='dark'] .markdown-content :where(p, div, section, article, aside, blockquote, details, summary, table, thead, tbody, tr, th, td, h1, h2, h3, h4, h5, h6, span:not([class*='hljs-']), li, ul, ol, figure, figcaption) {
+  color: var(--um-text) !important;
+  background-color: transparent !important;
+  border-color: var(--um-outline) !important;
+}
+:root[data-resolved-theme='dark'] .markdown-content :where(code, pre, kbd) {
+  color: var(--um-code-text) !important;
+  background-color: var(--um-code-bg) !important;
+  border-color: var(--um-outline) !important;
+}
+:root[data-resolved-theme='dark'] .markdown-content pre code {
+  background-color: transparent !important;
+}
+:root[data-resolved-theme='dark'] .markdown-content :where(a) { color: var(--um-primary) !important; }
+:root[data-resolved-theme='dark'] .markdown-content :where(th, blockquote, details) { background-color: var(--um-surface-container) !important; }
+
 .markdown-content table {
   width: 100%;
   border-collapse: collapse;

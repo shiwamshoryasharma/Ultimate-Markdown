@@ -71,7 +71,7 @@ test('single file images can be connected without losing edits or following link
   const next = page.waitForEvent('filechooser'); await page.getByRole('button', { name: 'Connect image folder', exact: true }).click()
   await (await next).setFiles(corpus)
   await expect(page.locator('.markdown-content img').first()).toBeVisible()
-  expect(await page.locator('.markdown-content img').first().evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBeTruthy()
+  await expect.poll(() => page.locator('.markdown-content img').first().evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBeTruthy()
   await page.getByRole('link', { name: 'Converter', exact: true }).click()
   await expect(page.getByText('1 document in export order')).toBeVisible({ timeout: 30000 })
   expect(await pageCount(page)).toBeGreaterThan(1)

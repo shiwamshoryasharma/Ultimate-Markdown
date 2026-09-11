@@ -1,4 +1,5 @@
 import { Select } from '@/components/common/Select'
+import { useLocation } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { Download, FileText, FolderOpen, ArrowUp, ArrowDown, Files, Type, Palette, Link2, PanelBottom, ScanEye, FileOutput, FileCode2, Table2, BookOpen, ShieldCheck } from 'lucide-react'
 import { AppShell } from '@/components/layout/AppShell'
@@ -20,6 +21,8 @@ import styles from './ConverterPage.module.css'
 
 const FORMATS: OutputFormat[] = ['pdf', 'docx', 'html', 'txt', 'xlsx']
 export function ConverterPage() {
+  const location = useLocation()
+  const initialSourceIds: string[] = Array.isArray(location.state?.sourceIds) ? location.state.sourceIds.filter((id: unknown): id is string => typeof id === 'string') : []
   const documents = useDocumentStore((state) => state.documents)
   const activeId = useDocumentStore((state) => state.activeId)
   const workspace = useWorkspaceStore((state) => state.workspace)
@@ -32,12 +35,12 @@ export function ConverterPage() {
   const { settings: s, update } = useConversionStore()
   const [panel, setPanel] = useState<'source' | 'design' | 'layout' | 'more'>('source')
   const [preview, setPreview] = useState<PagePreviewResult | null>(null)
-  const [sourceId, setSourceId] = useState<string | null>(activeId)
+  const [sourceId, setSourceId] = useState<string | null>(initialSourceIds[0] ?? activeId)
   const currentId = sourceId && (documents.has(sourceId) || workspace?.filesById.has(sourceId)) ? sourceId : activeId
   const currentNode = documents.get(currentId ?? '')?.node ?? workspace?.filesById.get(currentId ?? '')
   const canChain = hasFolderAccess(workspace) && !currentNode?.standalone && !!workspace?.filesById.has(currentId ?? '')
   const sourceMode = s.sourceMode === 'linked-chain' && !canChain ? 'current' : s.sourceMode
-  const [selected, setSelected] = useState<string[]>([])
+  const [selected, setSelected] = useState<string[]>(initialSourceIds)
   const modelInputs = useMemo(() => ({ workspace, documents, currentId, sourceMode, selected, links: s.internalMarkdownLinks, linkOverrides }), [workspace, documents, currentId, sourceMode, selected, s.internalMarkdownLinks, linkOverrides])
   const [prepared, setPrepared] = useState<{ inputs: typeof modelInputs; model: ExportModel } | null>(null)
   const model = prepared?.inputs === modelInputs ? prepared.model : null

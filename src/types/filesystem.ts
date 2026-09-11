@@ -5,6 +5,7 @@ export type DocumentExtension = (typeof DOCUMENT_EXTENSIONS)[number]
 export type FileOrigin = 'handle' | 'file'
 
 export interface FileNode {
+  embeddedAssets?: Record<string,string>
   /** Open File grants this file only. Attaching assets does not enable continuity. */
   standalone?: boolean
   assetWorkspace?: Workspace

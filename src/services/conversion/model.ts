@@ -23,7 +23,7 @@ import { isRemoteUrl, markdownTarget } from '@/services/markdown/documentLinks'
 import { readNavigation } from '@/services/markdown/navigationPlugin'
 import { slugify } from '@/services/markdown/slug'
 
-export interface SourceDocument { id: string; path: string; content: string; assetWorkspace?: Workspace | null; standalone?: boolean }
+export interface SourceDocument { embeddedAssets?: Record<string,string>; id: string; path: string; content: string; assetWorkspace?: Workspace | null; standalone?: boolean }
 export interface ModelDocument extends SourceDocument { tree: Root; css: string; scope: string }
 export interface ExportModel { documents: ModelDocument[]; warnings: string[] }
 export interface MissingDocumentLink { from: string; target: string }
@@ -64,7 +64,7 @@ export async function collectDocuments(workspace: Workspace | null, open: Map<st
     visited.add(node.path)
     let content: string
     try { content = open.get(id)?.content ?? await readFileText(node) } catch (error) { throw new Error(`Cannot read ${node.path}: ${error instanceof Error ? error.message : 'permission denied'}`) }
-    result.push({ id, path: node.path, content, standalone: node.standalone, assetWorkspace: node.assetWorkspace ?? (node.standalone ? null : workspace) })
+    result.push({ embeddedAssets:node.embeddedAssets, id, path: node.path, content, standalone: node.standalone, assetWorkspace: node.assetWorkspace ?? (node.standalone ? null : workspace) })
     if (!followChain) return
     const { tree } = parseDocument(content, 'discovery')
     const navigation = new Map<string, 'previous' | 'next'>()
@@ -152,7 +152,7 @@ export async function buildExportModel(sources: SourceDocument[], settings: Conv
       if (['img', 'video', 'audio', 'source'].includes(node.tagName) && typeof node.properties.src === 'string') {
         const src = node.properties.src
         const key = `${doc.path}::${src}`
-        if (!assets.has(key)) assets.set(key, embedAsset(doc.assetWorkspace === undefined ? workspace : doc.assetWorkspace, doc.path, src))
+        if (!assets.has(key)) assets.set(key, doc.embeddedAssets?.[src] ? Promise.resolve(doc.embeddedAssets[src]) : embedAsset(doc.assetWorkspace === undefined ? workspace : doc.assetWorkspace, doc.path, src))
         pending.push(assets.get(key)!.then((data) => {
           if (data) node.properties.src = data
           else { warnings.push(`Asset not embedded: ${src} (${doc.path}).`); if (!isRemoteUrl(src)) { node.tagName = 'span'; node.properties = {}; node.children = [{ type: 'text', value: `[Missing media: ${src}]` }] } }

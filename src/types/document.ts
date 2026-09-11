@@ -5,11 +5,12 @@ export interface OpenDocument {
   node: FileNode
   content: string
   originalContent: string
+  originalName?: string
   loadedAt: number
   /** true for "New Markdown Document" that has never been saved anywhere yet. */
   isNew: boolean
 }
 
 export function isDocumentDirty(doc: OpenDocument): boolean {
-  return doc.content !== doc.originalContent
+  return doc.content !== doc.originalContent || (!!doc.originalName && doc.node.name !== doc.originalName)
 }

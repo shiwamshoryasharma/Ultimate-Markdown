@@ -1,0 +1,2 @@
+export const MAX_IMPORT_BYTES = 200 * 1024 * 1024
+export const MAX_EXPANDED_DOCX_BYTES = 512 * 1024 * 1024

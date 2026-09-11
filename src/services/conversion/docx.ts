@@ -11,6 +11,7 @@ export async function exportDocx(model: ExportModel, s: ConversionSettings): Pro
   const [width, height] = pageDimensions(s)
   const alignment = s.alignment === 'justify' ? d.AlignmentType.JUSTIFIED : d.AlignmentType.LEFT
   const bookmark = (id: string) => `b_${id.replace(/[^a-zA-Z0-9_]/g, '_')}`
+  const compatibleImages = new Map<string,string>()
   const inline = (node: RootContent, style: IRunOptions = {}): ParagraphChild[] => {
     if (node.type === 'text') return [new d.TextRun({ ...style, text: node.value })]
     if (node.type !== 'element') return []
@@ -22,7 +23,7 @@ export async function exportDocx(model: ExportModel, s: ConversionSettings): Pro
     if (node.tagName === 'br') return [new d.TextRun({ break: 1 })]
     if (node.tagName === 'img') {
       const src = String(node.properties.src ?? '')
-      const match = /^data:image\/(png|jpe?g|gif|bmp);base64,(.*)$/i.exec(src)
+      const match = /^data:image\/(png|jpe?g|gif|bmp);base64,(.*)$/i.exec(compatibleImages.get(src)??src)
       if (match) {
         const data = Uint8Array.from(atob(match[2]), (char) => char.charCodeAt(0))
         const type = /jpe?g/.test(match[1]) ? 'jpg' : match[1] as 'png' | 'gif' | 'bmp'
@@ -31,7 +32,8 @@ export async function exportDocx(model: ExportModel, s: ConversionSettings): Pro
         const scale = Math.min(1, maxWidth / dimensions[0])
         return [new d.ImageRun({ data, type, transformation: { width: Math.round(dimensions[0] * scale), height: Math.round(dimensions[1] * scale) }, altText: { title: String(node.properties.alt ?? ''), description: String(node.properties.alt ?? ''), name: 'Image' } })]
       }
-      return [new d.TextRun(`[Image: ${String(node.properties.alt ?? src)}]`)]
+      const label=`[Image: ${String(node.properties.alt || 'Source image')}]`
+      return /^https?:/i.test(src) ? [new d.ExternalHyperlink({link:src,children:[new d.TextRun({text:label,color:s.linkColor.slice(1),underline:{}})]})] : [new d.TextRun(label)]
     }
     if (node.tagName === 'a') { next.color = s.linkColor.slice(1); next.underline = {} }
     const children = node.children.flatMap((child) => inline(child, next))
@@ -47,7 +49,13 @@ export async function exportDocx(model: ExportModel, s: ConversionSettings): Pro
   const images = new Set<string>()
   model.documents.forEach((doc) => walkElements(doc.tree, (node) => { if (node.tagName === 'img' && String(node.properties.src).startsWith('data:')) images.add(String(node.properties.src)) }))
   await Promise.all(Array.from(images).map((src) => new Promise<void>((resolve) => {
-    const img = new Image(); img.onload = () => { imageSizes.set(src, [img.naturalWidth, img.naturalHeight]); resolve() }; img.onerror = () => resolve(); img.src = src
+    const img = new Image(); img.onload = () => {
+      imageSizes.set(src, [img.naturalWidth, img.naturalHeight])
+      if(src.startsWith('data:image/webp;')&&img.naturalWidth*img.naturalHeight<=16000000) {
+        try {const canvas=document.createElement('canvas');canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;const context=canvas.getContext('2d');if(context){context.drawImage(img,0,0);compatibleImages.set(src,canvas.toDataURL('image/png'))}} catch { /* linked/placeholder fallback remains visible */ }
+      }
+      resolve()
+    }; img.onerror = () => resolve(); img.src = src
   })))
   let listIndex = 0
   const numbering: { reference: string; levels: { level: number; format: typeof d.LevelFormat.DECIMAL; text: string; alignment: typeof d.AlignmentType.LEFT; style: { paragraph: { indent: { left: number; hanging: number } } } }[] }[] = []

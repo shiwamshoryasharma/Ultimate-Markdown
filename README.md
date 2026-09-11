@@ -53,7 +53,7 @@ A Markdown workspace that turns your notes and linked manuals into documents rea
 | 🖼️ **Explore rich content** | Image zoom and downloads; themed video/audio playback, seeking, volume and speed; video fullscreen. |
 | 🧾 **Work with tables** | Modern responsive tables with row highlights, copy-to-clipboard, and CSV downloads. |
 
-Documents are processed locally in your browser. There is no application backend, account requirement, or document-upload service. Remote images referenced by your Markdown may still be fetched from their original URLs.
+Editing, parsing, review and conversion run locally in your browser. Webpage import uses the app’s small download service to retrieve public HTML and optional image copies; it needs no account or API key. Local HTML and DOCX files are never uploaded. Referenced remote images may also load from their original URLs.
 
 ## How to use the web app
 
@@ -64,7 +64,7 @@ Documents are processed locally in your browser. There is no application backend
 - Choose **Start writing** for a new document, or edit the live example and select **Open in editor**.
 - You can also drag and drop files or a folder onto the app.
 
-Use the file explorer to switch documents. Opened documents appear as tabs. The Home example stays separate from your files until you explicitly open or export it.
+Use the file explorer to switch documents. Opened documents appear as tabs with file icons. Use **+** to create another Markdown file. Double-click a tab, press **F2**, or use its pencil icon to rename it; **Enter** confirms and **Escape** cancels. The Home example stays separate from your files until you explicitly open or export it.
 
 ### 2. Write, preview, and save
 
@@ -78,7 +78,9 @@ Open **Settings** using the gear icon. Choose a coloured **Appearance**, **Edito
 
 ![Settings with coloured category cards, theme choices, and a live reading preview](readme_assets/settings.png)
 
-Select **Save** or use the save shortcut. When the browser grants write access, saving updates the selected file; otherwise, the app downloads a copy. Save your edits before reloading or closing the tab: open document contents are not persisted across reloads.
+One shared file tab bar controls both the editor and preview. Selecting a document updates both panes together. The same tabs remain available in reader mode and mobile preview; **+ New Markdown** creates a document for both.
+
+Select **Save** or use the save shortcut. When the browser grants write access, saving updates the selected file; otherwise, the app downloads a copy. After renaming an opened document, **Save / Ctrl+S downloads the new filename**; it does not overwrite the original file under its old name. **Save As** chooses a new disk location where supported. Save your edits before reloading or closing the tab: open document contents are not persisted across reloads.
 
 <details>
 <summary><strong>🖼️ See the editor and reader</strong></summary>
@@ -168,15 +170,43 @@ This mapping only activates when the complete four-file set is present and the o
 
 </details>
 
+## Import webpages, HTML and Word
+
+Choose **Import** in the navigation. **Web Page** needs only a URL and **Convert to Markdown**. The app downloads the page automatically through its own service, keeps a temporary copy, and opens Custom Preview. Users enter no API keys or provider settings. Browser CORS restrictions do not block this download step. If the source website itself refuses access, times out or requires login, the app explains the failure and offers **Import saved or pasted HTML** as an optional fallback; its source URL is retained for relative links and images.
+
+**HTML** accepts pasted markup or an uploaded `.html`/`.htm` file, an optional source URL, and matching local image attachments. **Word Document** parses DOCX locally, including embedded raster images and Word styles. Change style mappings and explicitly reparse when needed. **Documentation Site** discovers a bounded set of same-domain pages, lets you select them, and retains their chosen order. These pages use the same bounded download service.
+
+Every source opens a continuous document **Preview**, with **Copy Markdown** and **Download .md** visible above it. Markdown download uses the reviewed content directly; it does not require a PDF preview or a second confirmation. **Markdown** shows the generated source, **Edit blocks** exposes cleanup tools, and **Open in editor** continues in the existing workspace. Extraction notes stay collapsed. **More formats** opens the existing PDF/DOCX/HTML preview, design controls and Converter handoff. Multiple imported pages download as a Markdown ZIP.
+
+Main content extraction retains headings, nested lists and tasks, inline/fenced code, tables (complex cells stay HTML), links, callouts, captions and article images. Relative image paths, lazy-load attributes, `srcset` and `picture` sources resolve against the source URL. Remote image URLs stay in Markdown even if their bytes cannot be read. Temporary image copies feed the existing export model; when direct image fetching fails, the app tries its downloader automatically. If the source still refuses the image, a warning explains that it remains linked. HTML/PDF can display linked images when the source permits it; DOCX preserves a source link if it cannot embed the image.
+
+Import content and its original HTML stay in memory. Moving between application pages retains the review. **Close import session**, replacement or browser reload discards the temporary source; downloaded files and Markdown already opened in the editor are independent. Save before closing the browser. HTML/webpage content and DOCX files support up to **200 MiB** each. Word archives have a separate 512 MiB expanded-content bound. A cancellable browser worker prepares HTML and converts DOCX; local files are never uploaded. Long reviews show 100 sections at a time, with a 200,000-character display cap per section batch; Markdown downloads retain the complete content. Documentation discovery allows 30 pages / depth 3 within a 200 MiB session budget. Optional remote image copies remain limited to 60 images / 8 MiB per session.
+
+### Running the download service
+
+`npm run dev` includes `/api/import` automatically in Vite, including on `http://localhost:5173`. To run the production build and its download endpoint together:
+
+```sh
+npm run build
+npm start
+```
+
+The combined server defaults to `http://localhost:4173`. For deployment, set `HOST=0.0.0.0`, the hosting platform’s `PORT`, and `IMPORT_ALLOWED_ORIGINS` to the exact public application origin(s), separated by commas. Put the service behind HTTPS. These are deployment settings; users do not configure anything in the Import screen. The runtime uses Node built-ins and needs no paid scraping API.
+
+Existing static hosts can continue serving `web/`. To enable imports there, also host this Node service and set `VITE_IMPORT_ENDPOINT=https://your-service-host/api/import` when building the static app, with that app origin included in the service’s `IMPORT_ALLOWED_ORIGINS`. Static files alone cannot execute the download endpoint. The current Firebase deployment publishes the frontend only. As verified on 2026-09-11, the project has billing disabled; Cloud Run hosting for the downloader is not provisioned. Local DOCX/HTML import remains available, but public URL import needs a deployed endpoint.
+
+The service only downloads public HTTP/HTTPS HTML and raster images. It validates DNS addresses and pins outbound connections, checks each redirect, sends no browser credentials, bounds decoded response sizes/time/concurrency, and limits traffic. A bounded in-memory cache deduplicates downloads and expires after 60 seconds; no source HTML is written to disk or a database. Use `npm run test:download` to run its tests.
+
 ## Keyboard shortcuts
 
-Click inside the editor before using editing or search shortcuts. Save and New are handled on the Workspace page; browser or operating-system shortcuts can take precedence, especially New on some browsers. Use the visible buttons when a shortcut is intercepted.
+Click inside the editor before using editing or search shortcuts. Save and New are handled on the Workspace page. Chrome reserves Ctrl+N for a new browser window. Use **Ctrl+Alt+N** or the always-visible **+ New Markdown** button to create a document.
 
 | Action | Windows / Linux | macOS |
 | :--- | :--- | :--- |
 | Save | <kbd>Ctrl</kbd> + <kbd>S</kbd> | <kbd>⌘</kbd> + <kbd>S</kbd> |
 | Save as | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> | <kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> |
-| New document | <kbd>Ctrl</kbd> + <kbd>N</kbd> | <kbd>⌘</kbd> + <kbd>N</kbd> |
+| New document | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>N</kbd> | <kbd>Control</kbd> + <kbd>⌥</kbd> + <kbd>N</kbd> |
+| Rename focused document tab | <kbd>F2</kbd> | <kbd>F2</kbd> |
 | Find | <kbd>Ctrl</kbd> + <kbd>F</kbd> | <kbd>⌘</kbd> + <kbd>F</kbd> |
 | Find and replace | <kbd>Ctrl</kbd> + <kbd>H</kbd> | <kbd>⌘</kbd> + <kbd>H</kbd> |
 | Next match, with Find focused | <kbd>Enter</kbd> | <kbd>Enter</kbd> |
@@ -253,6 +283,12 @@ firebase deploy --only hosting --project ultimate-markdown --config firebase.jso
 
 Keep the explicit project flag. This deploys Hosting only; it does not deploy databases, rules, or functions. No Firebase SDK initialization is required for this static app.
 
+### Netlify ZIP deployment
+
+Extract **Ultimate-Markdown.zip** and drop the folder containing `index.html` into Netlify's manual deploy area. The ZIP contains the built `web/` files at its root; no build command is needed. Hash routes support Workspace, Import and Converter without rewrite rules.
+
+A manual static deployment includes the editor, local DOCX/HTML imports and exports. URL import additionally requires the Node download service described above; uploading the ZIP does not deploy that service. After provisioning an endpoint, rebuild with `VITE_IMPORT_ENDPOINT` and add the Netlify site's exact origin to `IMPORT_ALLOWED_ORIGINS` before repackaging.
+
 ### Google Search Console verification
 
 The owner's verification file is kept in `public/google12dac00c9b91bd8b.html`. Each build copies it into `dist` and `web`, so it remains available after redeployment at [the verification URL](https://ultimate-markdown.web.app/google12dac00c9b91bd8b.html).
@@ -315,3 +351,5 @@ Created by [Shiwam Shorya Sharma](https://github.com/shiwamshoryasharma). For co
 [firebase-app]: https://ultimate-markdown.firebaseapp.com/
 [netlify]: https://ultimate-markdown.netlify.app/
 [cloudflare]: https://ultimate-markdown.shiwamshoryasharma.workers.dev/
+
+Destructive document and import actions use a themed confirmation dialog with keyboard navigation, Escape to cancel, and explicit discard actions. The dialog follows the light, dark or system theme.

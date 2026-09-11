@@ -1,3 +1,4 @@
+import { isDocumentDirty } from '@/types/document'
 import { useState } from 'react'
 import { FolderOpen, Search, X } from 'lucide-react'
 import { EmptyState } from '@/components/common/EmptyState'
@@ -19,7 +20,7 @@ export function ExplorerPanel() {
 
   const dirtyIds = new Set<string>()
   for (const [id, doc] of documents) {
-    if (doc.content !== doc.originalContent) dirtyIds.add(id)
+    if (isDocumentDirty(doc)) dirtyIds.add(id)
   }
 
   const handleSelect = (node: FileNode) => {

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { NavLink } from 'react-router-dom'
-import { FileEdit, LayoutGrid, RefreshCw, Settings } from 'lucide-react'
+import { Link, NavLink } from 'react-router-dom'
+import { FileEdit, FileInput, LayoutGrid, RefreshCw, Settings } from 'lucide-react'
 import clsx from 'clsx'
 import { ThemeToggle } from '@/components/common/ThemeToggle'
 import iconButtonStyles from '@/components/common/IconButton.module.css'
@@ -9,6 +9,7 @@ import styles from './TopAppBar.module.css'
 const NAV_ITEMS = [
   { to: '/', label: 'Home', icon: LayoutGrid, end: true },
   { to: '/workspace', label: 'Workspace', icon: FileEdit, end: false },
+  { to: '/import', label: 'Import', icon: FileInput, end: false },
   { to: '/converter', label: 'Converter', icon: RefreshCw, end: false },
 ]
 
@@ -20,10 +21,10 @@ interface TopAppBarProps {
 export function TopAppBar({ actions }: TopAppBarProps) {
   return (
     <header className={styles.bar}>
-      <div className={styles.brand}>
+      <Link to="/" className={styles.brand} aria-label="Ultimate Markdown home">
         <img className={styles.mark} src={`${import.meta.env.BASE_URL}ultimate-markdown-logo.png`} alt="" width="36" height="36" />
         <span className={styles.wordmark}>Ultimate Markdown</span>
-      </div>
+      </Link>
 
       <nav className={styles.nav} aria-label="Primary">
         {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (

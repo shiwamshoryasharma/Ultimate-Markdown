@@ -9,10 +9,15 @@ export function useThemeSync() {
 
   useEffect(() => {
     const root = document.documentElement
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const sync = () => { root.dataset.resolvedTheme = theme === 'system' ? (media.matches ? 'dark' : 'light') : theme }
+    sync()
+    media.addEventListener('change', sync)
     if (theme === 'system') {
       root.removeAttribute('data-theme')
     } else {
       root.setAttribute('data-theme', theme)
     }
+    return () => media.removeEventListener('change', sync)
   }, [theme])
 }

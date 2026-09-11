@@ -85,3 +85,16 @@
   width: 13px;
   height: 13px;
 }
+.fileIcon{width:16px;height:16px;flex:none;color:var(--um-primary)}
+.renameButton{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border:0;border-radius:6px;background:transparent;color:var(--um-text-tertiary);cursor:pointer;flex:none;opacity:0}
+.renameButton svg{width:12px;height:12px}.tab:hover .renameButton,.tab:focus-within .renameButton{opacity:1}.renameButton:hover{color:var(--um-primary);background:var(--um-surface-container-high)}
+.rename{display:flex;min-width:0;align-items:center;gap:6px}.rename input{width:150px;min-width:80px;padding:4px 7px;border:1px solid var(--um-primary);border-radius:6px;background:var(--um-surface-container);color:var(--um-text);font:inherit;font-size:13px}.rename input[aria-invalid=true]{border-color:var(--um-danger)}.renameError{font-size:10px;color:var(--um-danger);max-width:140px;white-space:normal}.tab:has(.renameError){max-width:400px;height:auto;min-height:38px}
+@media(pointer:coarse){.renameButton{opacity:1}}
+
+.addButton{display:flex;align-items:center;justify-content:center;flex:none;width:34px;height:34px;border:0;border-radius:8px;background:transparent;color:var(--um-text-secondary);cursor:pointer;margin-bottom:4px}.addButton svg{width:18px;height:18px}.addButton:hover,.addButton[aria-pressed=true]{background:var(--um-primary-container);color:var(--um-on-primary-container)}
+
+.strip{display:flex;align-items:stretch;flex:0 0 auto;min-width:0;max-width:100%;background:var(--um-surface-container);border-bottom:1px solid var(--um-outline-variant)}
+.strip .tabs{flex:1 1 auto;min-width:0;border-bottom:0}
+.tabActions{display:flex;align-items:center;flex:none;gap:4px;padding:6px 8px 2px;border-left:1px solid var(--um-outline-variant)}
+.tabActions .addButton{width:auto;min-width:34px;padding:0 10px;gap:6px;background:var(--um-primary-container);color:var(--um-on-primary-container);font:600 12px var(--um-font-sans);white-space:nowrap}
+.tabActions .addButton:focus-visible{outline:2px solid var(--um-primary);outline-offset:2px}

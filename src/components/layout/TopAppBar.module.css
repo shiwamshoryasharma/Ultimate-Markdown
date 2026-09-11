@@ -10,6 +10,8 @@
 }
 
 .brand {
+  color: var(--um-text);
+  text-decoration: none;
   display: flex;
   align-items: center;
   gap: var(--um-space-3);
@@ -91,6 +93,11 @@
   align-items: center;
   gap: var(--um-space-2);
   flex: 0 0 auto;
+}
+
+@media (max-width: 420px) {
+  .bar .nav { flex-wrap: wrap; }
+  .bar .navItem { padding: 0 5px; gap: 4px; }
 }
 
 @media (max-width: 720px) {

@@ -1,3 +1,4 @@
+import { isDocumentDirty } from '@/types/document'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { EditorView } from '@codemirror/view'
@@ -60,14 +61,12 @@ export function WorkspacePage() {
   const saving = useDocumentStore((state) => state.saving)
   const docError = useDocumentStore((state) => state.error)
   const clearDocError = useDocumentStore((state) => state.clearError)
-  const hasAnyUnsaved = useDocumentStore((state) => state.hasAnyUnsaved)
   const openDocument = useDocumentStore((state) => state.openDocument)
 
   const editorSettings = useSettingsStore((state) => state.editor)
   const previewSettings = useSettingsStore((state) => state.preview)
 
   const activeDocument = activeId ? documents.get(activeId) : null
-
   const [explorerCollapsed, setExplorerCollapsed] = useState(() => viewport !== 'desktop')
   const [explorerWidth, setExplorerWidth] = useState(280)
   const [tocOpen, setTocOpen] = useState(false)
@@ -96,20 +95,24 @@ export function WorkspacePage() {
   )
 
   const handleSave = useCallback(async () => {
-    if (!activeId || !activeDocument) return
-    const result = await saveDocument(activeId)
+    const current=useDocumentStore.getState()
+    const doc=current.activeId?current.documents.get(current.activeId):undefined
+    if (!doc) return
+    const result = await saveDocument(doc.id)
     if (result === 'unsupported') {
-      downloadTextFile(activeDocument.content, activeDocument.node.name)
+      downloadTextFile(doc.content, doc.node.name)
     }
-  }, [activeId, activeDocument, saveDocument])
+  }, [saveDocument])
 
   const handleSaveAs = useCallback(async () => {
-    if (!activeId || !activeDocument) return
-    const result = await saveDocumentAs(activeId)
+    const current=useDocumentStore.getState()
+    const doc=current.activeId?current.documents.get(current.activeId):undefined
+    if (!doc) return
+    const result = await saveDocumentAs(doc.id)
     if (result === 'unsupported') {
-      downloadTextFile(activeDocument.content, activeDocument.node.name)
+      downloadTextFile(doc.content, doc.node.name)
     }
-  }, [activeId, activeDocument, saveDocumentAs])
+  }, [saveDocumentAs])
 
   const handleNavigateToDocument = useCallback(
     (path: string) => {
@@ -119,7 +122,7 @@ export function WorkspacePage() {
     [workspace, openDocument],
   )
 
-  // Keyboard shortcuts: Ctrl/Cmd+S save, Ctrl/Cmd+N new document. Full shortcut set + command palette land in a later phase.
+  // Chrome reserves Ctrl+N for a browser window; use Ctrl+Alt+N for documents.
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       const isMod = event.ctrlKey || event.metaKey
@@ -129,26 +132,16 @@ export function WorkspacePage() {
         event.preventDefault()
         if (event.shiftKey) void handleSaveAs()
         else void handleSave()
-      } else if (key === 'n' && !event.shiftKey) {
-        event.preventDefault()
-        createNewDocument()
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [handleSave, handleSaveAs, createNewDocument])
 
-  // Warn before closing the tab/browser if any open document has unsaved edits.
-  useEffect(() => {
-    const handler = (event: BeforeUnloadEvent) => {
-      if (hasAnyUnsaved()) {
-        event.preventDefault()
-        event.returnValue = ''
-      }
-    }
-    window.addEventListener('beforeunload', handler)
-    return () => window.removeEventListener('beforeunload', handler)
-  }, [hasAnyUnsaved])
+  useEffect(()=>{
+    const create=(event:KeyboardEvent)=>{if(event.ctrlKey&&event.altKey&&event.code==='KeyN'&&!event.shiftKey){event.preventDefault();event.stopPropagation();if(document.querySelector('dialog[open]'))return;createNewDocument();exitReaderMode();setMobileTab('edit');requestAnimationFrame(()=>editorViewRef.current?.focus())}}
+    window.addEventListener('keydown',create,true);return()=>window.removeEventListener('keydown',create,true)
+  },[createNewDocument,exitReaderMode])
 
   const { dragActive, dragHandlers } = useFileDrop(async (dataTransfer) => {
     await openDropped(dataTransfer)
@@ -171,7 +164,7 @@ export function WorkspacePage() {
     })
   }, [])
 
-  const isDirty = activeId ? activeDocument?.content !== activeDocument?.originalContent : false
+  const isDirty = !!activeDocument && isDocumentDirty(activeDocument)
 
   const topBarActions = (
     <>
@@ -223,7 +216,7 @@ export function WorkspacePage() {
   if (readerMode && activeDocument) {
     return (
       <AppShell topBar={<TopAppBar actions={topBarActions} />}>
-        <div className={styles.readerRoot}>
+        <div className={styles.readerWithTabs}><DocumentTabs/><div className={styles.readerRoot}>
           <div className={styles.readerScroll} ref={previewScrollRef}>
             <DocumentReader
               content={activeDocument.content}
@@ -239,7 +232,7 @@ export function WorkspacePage() {
               <TocPanel content={activeDocument.content} scrollContainerRef={previewScrollRef} />
             </div>
           )}
-        </div>
+        </div></div>
       </AppShell>
     )
   }
@@ -334,11 +327,11 @@ export function WorkspacePage() {
 
         {viewport === 'mobile' && mobileTab === 'edit' && (
           <div className={styles.mobilePane}>
+            <DocumentTabs />
             {!activeDocument ? (
               <EmptyState icon={<FileText />} title="No document selected" description="Open a file from the Files tab, or start a new one." />
             ) : (
               <>
-                <DocumentTabs />
                 <EditorToolbar getView={() => editorViewRef.current} />
                 <div className={styles.editorPane} style={{ width: '100%', flex: 1 }}>
                   <MarkdownEditor
@@ -358,6 +351,7 @@ export function WorkspacePage() {
 
         {viewport === 'mobile' && mobileTab === 'preview' && (
           <div className={styles.mobilePane}>
+            <DocumentTabs />
             {!activeDocument ? (
               <EmptyState icon={<FileText />} title="Nothing to preview" description="Open or write a document first." />
             ) : (

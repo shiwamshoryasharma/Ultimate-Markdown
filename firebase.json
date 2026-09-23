@@ -5,6 +5,10 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "headers": [
       {
+        "source": "/ultimate-markdown-extension.zip",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+      },
+      {
         "source": "/index.html",
         "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
       },

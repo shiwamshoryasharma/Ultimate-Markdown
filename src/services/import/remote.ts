@@ -1,28 +1,31 @@
 import { prepareImport } from './prepare'
+import { downloadWithExtension } from './extension'
 import type { CrawlOptions, DiscoveredPage } from '@/types/import'
 import { canonicalUrl, MAX_HTML_BYTES, pageLinks } from './html'
 
-/** App-owned downloader handles cross-origin retrieval; source parsing stays local. */
+/** The locally installed extension retrieves bytes; parsing stays in this app. */
 export async function downloadResource(value:string,kind:'page'|'image',signal:AbortSignal):Promise<{url:string;html?:string;data?:string}> {
   const url=canonicalUrl(value)
-  const endpoint=new URL(import.meta.env.VITE_IMPORT_ENDPOINT||'api/import',new URL(import.meta.env.BASE_URL,window.location.href))
-  let response:Response
-  try {
-    response=await fetch(endpoint,{method:'POST',credentials:'omit',headers:{'Content-Type':'application/json','Accept':kind==='page'?'text/html':'application/json'},body:JSON.stringify({url,kind}),signal:AbortSignal.any([signal,AbortSignal.timeout(185000)])})
-  } catch {
-    if(signal.aborted)throw new Error('Import stopped.')
-    throw new Error('The page could not be downloaded. Please try again in a moment.')
+  const response = await downloadWithExtension(url, kind, signal)
+  if (kind === 'page') {
+    // Preserve non-UTF-8 pages before the worker's UTF-8 streaming preparation.
+    const charset = /charset\s*=\s*["']?([^\s;"']+)/i.exec(response.blob.type)?.[1]
+    let blob = response.blob
+    if (charset && !/^utf-?8$/i.test(charset)) {
+      let decoder: TextDecoder
+      try { decoder = new TextDecoder(charset) } catch { decoder = new TextDecoder() }
+      blob = new Blob([decoder.decode(await blob.arrayBuffer())], { type: 'text/html' })
+    }
+    const result = await prepareImport({ kind: 'html', file: blob }, signal)
+    return { url: response.url, html: result.html }
   }
-  if(response.ok&&kind==='page'&&response.headers.get('content-type')?.includes('text/html')) {
-    const blob=await response.blob()
-    if(blob.size>MAX_HTML_BYTES)throw new Error('This page exceeds the 200 MiB import limit.')
-    const result=await prepareImport({kind:'html',file:blob},signal)
-    return {url:response.headers.get('X-Import-Final-URL')||url,html:result.html}
-  }
-  if(!response.headers.get('content-type')?.includes('application/json'))throw new Error('Web import is currently unavailable on this host. Please try again shortly.')
-  const result=await response.json()
-  if(!response.ok)throw new Error(result.error||'The website could not be downloaded. Check the address and try again.')
-  return result
+  const data = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(new Error('Could not read the downloaded image.'))
+    reader.readAsDataURL(response.blob)
+  })
+  return { url: response.url, data }
 }
 export async function retrievePage(value: string, signal: AbortSignal): Promise<{url:string; html:string}> {
   const result=await downloadResource(value,'page',signal)

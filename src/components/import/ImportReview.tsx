@@ -4,6 +4,7 @@ import { Copy, Download, Eye, Code2, SlidersHorizontal, FileOutput, FileCode2, C
 import { useConfirmation } from '@/hooks/useConfirmation'
 import { ArrowDown, ArrowUp, RotateCcw, Trash2 } from 'lucide-react'
 import { MarkdownPreview } from '@/components/preview/MarkdownPreview'
+import { BackToTop } from '@/components/common/BackToTop'
 import { Select } from '@/components/common/Select'
 import { useImportStore } from '@/stores/importStore'
 import type { ImportSession } from '@/types/import'
@@ -60,5 +61,6 @@ function ReviewDocument({session}:{session:ImportSession}) {
         </article>})}
         <button type="button" className={styles.primary} onClick={()=>setMode('preview')}>Done editing</button>
       </div>}
+    <BackToTop/>
   </section>
 }

@@ -1,6 +1,7 @@
 import { access, cp, lstat, realpath, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { packageExtension } from './package-extension.mjs'
 
 const project = await realpath(fileURLToPath(new URL('../', import.meta.url)))
 const source = path.resolve(project, 'dist')
@@ -18,4 +19,8 @@ await rm(target, { recursive: true, force: true })
 await cp(source, target, { recursive: true })
 await cp(path.join(project, 'LICENSE'), path.join(target, 'LICENSE'))
 await writeFile(path.join(target, '.nojekyll'), '')
+const extension = await packageExtension()
+await writeFile(path.join(project, 'public', 'ultimate-markdown-extension.zip'), extension)
+await writeFile(path.join(source, 'ultimate-markdown-extension.zip'), extension)
+await writeFile(path.join(target, 'ultimate-markdown-extension.zip'), extension)
 console.log('Copied dist/ to web/ (ready for static hosting).')

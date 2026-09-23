@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Ultimate Markdown — URL Import",
+  "version": "1.0.0",
+  "description": "Download public webpages into Ultimate Markdown, with approval for each app visit. No backend or account.",
+  "minimum_chrome_version": "120",
+  "permissions": ["storage"],
+  "optional_host_permissions": ["https://*/*", "http://*/*"],
+  "background": { "service_worker": "background.mjs", "type": "module" },
+  "content_scripts": [{
+    "matches": ["https://ultimate-markdown.web.app/*", "https://ultimate-markdown.firebaseapp.com/*", "http://localhost/*", "http://127.0.0.1/*"],
+    "js": ["bridge.js"],
+    "run_at": "document_start",
+    "all_frames": false
+  }],
+  "action": { "default_title": "Ultimate Markdown URL Import", "default_popup": "help.html" },
+  "content_security_policy": { "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'" }
+}

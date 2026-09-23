@@ -53,7 +53,7 @@ A Markdown workspace that turns your notes and linked manuals into documents rea
 | 🖼️ **Explore rich content** | Image zoom and downloads; themed video/audio playback, seeking, volume and speed; video fullscreen. |
 | 🧾 **Work with tables** | Modern responsive tables with row highlights, copy-to-clipboard, and CSV downloads. |
 
-Editing, parsing, review and conversion run locally in your browser. Webpage import uses the app’s small download service to retrieve public HTML and optional image copies; it needs no account or API key. Local HTML and DOCX files are never uploaded. Referenced remote images may also load from their original URLs.
+Editing, parsing, review and conversion run locally in your browser. Webpage import uses the optional Chrome/Edge companion extension to download public HTML and image copies directly on your device after permission for the current visit. It needs no backend, account or API key. Local HTML and DOCX files are never uploaded. Referenced remote images may also load from their original URLs.
 
 ## How to use the web app
 
@@ -172,30 +172,38 @@ This mapping only activates when the complete four-file set is present and the o
 
 ## Import webpages, HTML and Word
 
-Choose **Import** in the navigation. **Web Page** needs only a URL and **Convert to Markdown**. The app downloads the page automatically through its own service, keeps a temporary copy, and opens Custom Preview. Users enter no API keys or provider settings. Browser CORS restrictions do not block this download step. If the source website itself refuses access, times out or requires login, the app explains the failure and offers **Import saved or pasted HTML** as an optional fallback; its source URL is retained for relative links and images.
+Choose **Import** in the navigation. **Web Page** uses the **Ultimate Markdown URL Import companion extension** in Chrome or Edge. Install it once using **Download extension** and the instructions on the Import screen. Paste a URL, approve **Allow for this visit** in the extension window, then select **Convert to Markdown**. The extension downloads the HTML directly on your device, and the existing browser pipeline prepares the preview and Markdown. There is no download backend, account, API key or provider configuration. If a website refuses access, requires login or provides no readable HTML, use **Import saved or pasted HTML**; its source URL is retained for relative links and images.
 
-**HTML** accepts pasted markup or an uploaded `.html`/`.htm` file, an optional source URL, and matching local image attachments. **Word Document** parses DOCX locally, including embedded raster images and Word styles. Change style mappings and explicitly reparse when needed. **Documentation Site** discovers a bounded set of same-domain pages, lets you select them, and retains their chosen order. These pages use the same bounded download service.
+**HTML** accepts pasted markup or an uploaded `.html`/`.htm` file, an optional source URL, and matching local image attachments. **Word Document** parses DOCX locally, including embedded raster images and Word styles. Neither requires the extension or URL permission. Change style mappings and explicitly reparse when needed. **Documentation Site** discovers a bounded set of same-domain pages through the approved extension session, lets you select them, and retains their chosen order.
 
 Every source opens a continuous document **Preview**, with **Copy Markdown** and **Download .md** visible above it. Markdown download uses the reviewed content directly; it does not require a PDF preview or a second confirmation. **Markdown** shows the generated source, **Edit blocks** exposes cleanup tools, and **Open in editor** continues in the existing workspace. Extraction notes stay collapsed. **More formats** opens the existing PDF/DOCX/HTML preview, design controls and Converter handoff. Multiple imported pages download as a Markdown ZIP.
 
-Main content extraction retains headings, nested lists and tasks, inline/fenced code, tables (complex cells stay HTML), links, callouts, captions and article images. Relative image paths, lazy-load attributes, `srcset` and `picture` sources resolve against the source URL. Remote image URLs stay in Markdown even if their bytes cannot be read. Temporary image copies feed the existing export model; when direct image fetching fails, the app tries its downloader automatically. If the source still refuses the image, a warning explains that it remains linked. HTML/PDF can display linked images when the source permits it; DOCX preserves a source link if it cannot embed the image.
+Main content extraction retains headings, nested lists and tasks, inline/fenced code, tables (complex cells stay HTML), links, callouts, captions and article images. Relative image paths, lazy-load attributes, `srcset` and `picture` sources resolve against the source URL. Remote image URLs stay in Markdown even if their bytes cannot be read. Temporary image copies feed the existing export model; when direct image fetching fails, the app tries the approved extension session. If the source still refuses the image, a warning explains that it remains linked. HTML/PDF can display linked images when the source permits it; DOCX preserves a source link if it cannot embed the image.
 
 Import content and its original HTML stay in memory. Moving between application pages retains the review. **Close import session**, replacement or browser reload discards the temporary source; downloaded files and Markdown already opened in the editor are independent. Save before closing the browser. HTML/webpage content and DOCX files support up to **200 MiB** each. Word archives have a separate 512 MiB expanded-content bound. A cancellable browser worker prepares HTML and converts DOCX; local files are never uploaded. Long reviews show 100 sections at a time, with a 200,000-character display cap per section batch; Markdown downloads retain the complete content. Documentation discovery allows 30 pages / depth 3 within a 200 MiB session budget. Optional remote image copies remain limited to 60 images / 8 MiB per session.
 
-### Running the download service
+### Extension setup and visit permissions
 
-`npm run dev` includes `/api/import` automatically in Vite, including on `http://localhost:5173`. To run the production build and its download endpoint together:
+Imported inline text, links, emphasis and line breaks stay together. Safe HTML without a faithful Markdown equivalent is preserved: disclosures (`details`/`summary`), definition lists, merged tables, superscript/subscript, keyboard keys, highlights, underline and other semantic text. Scripts, event handlers, embedded frames and source styles remain removed; import preserves document content, not an interactive website or its exact CSS layout. A **Back to top** button appears after scrolling in import Preview/Markdown and the workspace reader, including mobile layouts.
+
+The companion is currently an **unpacked extension**, not a Chrome Web Store listing. Download its ZIP, extract it into a permanent folder, open `chrome://extensions` or `edge://extensions`, enable Developer mode and select **Load unpacked**. Choose the extracted folder containing `manifest.json`. Save any unsaved documents before reloading the app to connect it. The website cannot silently install the extension or approve Chrome's permission prompt.
+
+On first use, Chrome requests optional HTTP/HTTPS website access. The extension separately asks for approval on **every app visit**. That visit allows multiple public URLs, resets on refresh/navigation away/tab close, and can be ended with **End URL session**. Internal app navigation keeps the same visit; another tab needs its own approval. Chrome's underlying host permission remains until revoked in extension settings, but cannot substitute for the extension's per-visit approval.
+
+Only `ultimate-markdown.web.app`, `ultimate-markdown.firebaseapp.com`, and localhost/127.0.0.1 development ports 5173, 4173, 5174 and 4174 can connect. Other deployment domains require an explicit extension allowlist update. See [extension/README.md](extension/README.md) for access boundaries and update instructions.
+
+`npm run build` packages the extension and copies it to the static output along with the app. Both Firebase Hosting and `npm start` serve static files; neither runs a URL download API:
 
 ```sh
 npm run build
 npm start
 ```
 
-The combined server defaults to `http://localhost:4173`. For deployment, set `HOST=0.0.0.0`, the hosting platform’s `PORT`, and `IMPORT_ALLOWED_ORIGINS` to the exact public application origin(s), separated by commas. Put the service behind HTTPS. These are deployment settings; users do not configure anything in the Import screen. The runtime uses Node built-ins and needs no paid scraping API.
+The local static server defaults to `http://localhost:4173`. Vite development uses `http://localhost:5173`. Both use the same extension path as production. `VITE_IMPORT_ENDPOINT` and `IMPORT_ALLOWED_ORIGINS` are no longer used by the app.
 
-Existing static hosts can continue serving `web/`. To enable imports there, also host this Node service and set `VITE_IMPORT_ENDPOINT=https://your-service-host/api/import` when building the static app, with that app origin included in the service’s `IMPORT_ALLOWED_ORIGINS`. Static files alone cannot execute the download endpoint. The current Firebase deployment publishes the frontend only. As verified on 2026-09-11, the project has billing disabled; Cloud Run hosting for the downloader is not provisioned. Local DOCX/HTML import remains available, but public URL import needs a deployed endpoint.
+URL downloads now work through the installed companion on the static Firebase site; Firebase billing and Cloud Run are not required. Local HTML/DOCX imports, the editor, and exports continue to work without the companion. Mobile browsers without Chrome-compatible extension support can use local HTML/DOCX import.
 
-The service only downloads public HTTP/HTTPS HTML and raster images. It validates DNS addresses and pins outbound connections, checks each redirect, sends no browser credentials, bounds decoded response sizes/time/concurrency, and limits traffic. A bounded in-memory cache deduplicates downloads and expires after 60 seconds; no source HTML is written to disk or a database. Use `npm run test:download` to run its tests.
+The extension omits credentials and streams bounded chunks, retains the 200 MiB HTML limit and cancellation, and never executes imported website scripts. The existing parser still sanitizes all content. Historical Node download-service modules and their tests remain in the repository but are disconnected from the default Vite/static app. Run `node --test tests/extension-core.test.mjs tests/extension-session.test.mjs` and `npx playwright test tests/extension-import.spec.ts` for companion regression coverage.
 
 ## Keyboard shortcuts
 
@@ -287,7 +295,7 @@ Keep the explicit project flag. This deploys Hosting only; it does not deploy da
 
 Extract **Ultimate-Markdown.zip** and drop the folder containing `index.html` into Netlify's manual deploy area. The ZIP contains the built `web/` files at its root; no build command is needed. Hash routes support Workspace, Import and Converter without rewrite rules.
 
-A manual static deployment includes the editor, local DOCX/HTML imports and exports. URL import additionally requires the Node download service described above; uploading the ZIP does not deploy that service. After provisioning an endpoint, rebuild with `VITE_IMPORT_ENDPOINT` and add the Netlify site's exact origin to `IMPORT_ALLOWED_ORIGINS` before repackaging.
+A manual static deployment includes the editor, local DOCX/HTML imports and exports. URL import uses the installed companion extension. The shipped companion accepts only the Firebase domains and development origins listed above. To support a Netlify site, explicitly add its exact origin to the extension's manifest and app-origin allowlist, then distribute that updated extension.
 
 ### Google Search Console verification
 

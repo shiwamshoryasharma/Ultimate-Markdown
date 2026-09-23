@@ -1,4 +1,5 @@
 import { Select } from '@/components/common/Select'
+import { BackToTop } from '@/components/common/BackToTop'
 import { useEffect, useMemo, useState, type ComponentProps } from 'react'
 import { MarkdownPreview } from './MarkdownPreview'
 import { useDocumentStore } from '@/stores/documentStore'
@@ -49,5 +50,6 @@ export function DocumentReader(props: ComponentProps<typeof MarkdownPreview>) {
     {continuous && canContinue && warnings.length > 0 && <details className="document-reading-warnings"><summary>Linked document warnings</summary>{warnings.map((warning) => <p key={warning}>{warning}</p>)}</details>}
     <MarkdownPreview key={props.documentPath} {...props} workspace={assets} navigationWorkspace={canContinue ? props.workspace : null} />
     {continuous && canContinue && chain.filter((doc) => doc.path !== props.documentPath).map((doc) => <section key={doc.id}><div className="document-boundary">{doc.path}</div><MarkdownPreview {...props} workspace={doc.assetWorkspace ?? props.workspace} content={doc.content} documentPath={doc.path} /></section>)}
+    <BackToTop/>
   </div>
 }

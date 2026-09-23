@@ -69,11 +69,18 @@ function converter() {
     const width = Math.max(...rows.map(row => row.length))
     const lines = rows.map(row => '| ' + Array.from({length:width}, (_,i) => row[i] ?? '').join(' | ') + ' |')
     lines.splice(1, 0, '| ' + Array(width).fill('---').join(' | ') + ' |')
-    return '\n\n' + lines.join('\n') + '\n\n'
+    const caption = table.caption ? td.turndown(table.caption.innerHTML).trim() : ''
+    return '\n\n' + (caption ? caption + '\n\n' : '') + lines.join('\n') + '\n\n'
   } })
   td.addRule('caption', { filter: node=>node.nodeName.toLowerCase()==='figcaption'||(node as Element).classList?.contains('caption'), replacement: content => `\n\n*${content.trim()}*\n\n` })
   td.addRule('taskMarker', {filter:node=>(node as Element).classList?.contains('um-import-task'),replacement:(_content,node)=>node.textContent||''})
-  td.addRule('underline', {filter:'u',replacement:content=>`<u>${content}</u>`})
+  // Keep sanitized semantic structures that have no faithful Markdown syntax.
+  // Preserve their HTML children too: Markdown inside inline HTML is not portable.
+  td.addRule('semanticHtml', {filter:['details','summary','dl','dt','dd','sup','sub','kbd','mark','u','ins','abbr','q','cite','samp','var','time','ruby','rt','rp'],replacement:(_content,node)=>{
+    const el = node as Element
+    const html = el.outerHTML
+    return el.matches('details, summary, dl, dt, dd') ? '\n\n' + html + '\n\n' : html
+  }})
   td.addRule('strikethrough', { filter: ['del', 's'], replacement: content => `~~${content}~~` })
   td.addRule('math', { filter: node => node.nodeName.toLowerCase() === 'math' || (node as HTMLElement).classList?.contains('math'), replacement: (content, node) => {
     const el = node as Element, tex = el.querySelector('annotation[encoding="application/x-tex"]')?.textContent
@@ -87,7 +94,7 @@ function typeOf(el: Element): ImportBlockType | null {
   if (el.matches('.admonition, .callout, [role="note"]')) return 'callout'
   if (el.matches('.caption, figcaption')) return 'caption'
   if(el.tagName==='P'&&el.querySelector('img')&&!el.textContent?.trim()) return 'image'
-  return ({ P: 'paragraph', OL: 'ordered-list', UL: 'unordered-list', IMG: 'image', TABLE: 'table', PRE: 'code', BLOCKQUOTE: 'quote', HR: 'divider' } as Record<string, ImportBlockType>)[el.tagName] ?? null
+  return ({ P: 'paragraph', DETAILS: 'paragraph', DL: 'paragraph', OL: 'ordered-list', UL: 'unordered-list', IMG: 'image', TABLE: 'table', PRE: 'code', BLOCKQUOTE: 'quote', HR: 'divider' } as Record<string, ImportBlockType>)[el.tagName] ?? null
 }
 export function parseHtml(html: string, source: ImportedDocument['source'], options: { includeImages: boolean; extractMain?: boolean; generated?: boolean } = { includeImages: true }): ImportedDocument {
   if (new TextEncoder().encode(html).length > (options.generated?MAX_EXPANDED_DOCX_BYTES:MAX_HTML_BYTES)) throw new Error('HTML exceeds the 200 MiB import limit.')
@@ -143,15 +150,27 @@ export function parseHtml(html: string, source: ImportedDocument['source'], opti
     blocks.push({ id: `${id}-block-${blocks.length}`, sourceId: el.id || undefined, type, markdown, include: true, removed: false, warnings: notes })
   }
   const walk = (parent: Element) => {
+    let inline = parsed.createElement('p')
+    const flush = () => {
+      if (inline.hasChildNodes()) add(inline, typeOf(inline) ?? 'paragraph')
+      inline = parsed.createElement('p')
+    }
     for (const node of Array.from(parent.childNodes)) {
-      if (node.nodeType === Node.TEXT_NODE) { if (node.textContent?.trim()) { const p = parsed.createElement('p'); p.textContent = node.textContent; add(p, 'paragraph') } continue }
+      // Keep spaces and phrasing nodes together so links/emphasis and hard line
+      // breaks remain in their original paragraph instead of separate blocks.
+      if (node.nodeType === Node.TEXT_NODE) { inline.append(node.cloneNode(true)); continue }
       if (!(node instanceof Element)) continue
       const type = typeOf(node)
+      if (!type && node.matches('a, abbr, b, bdi, bdo, br, cite, code, del, em, i, ins, kbd, mark, math, q, ruby, rt, rp, s, samp, small, span, strong, sub, sup, time, u, var, wbr') && !node.querySelector('div, section, article, p, h1, h2, h3, h4, h5, h6, ul, ol, table, pre, blockquote, details, dl')) {
+        inline.append(node.cloneNode(true))
+        continue
+      }
+      flush()
       if (type) add(node, type)
-      else if (node.matches('div, section, article, main, header, figure, picture, aside, dl, dd, dt, details, summary, body')) walk(node)
-      else if(node.matches('span, small')) add(node,'paragraph')
-      else { add(node, 'paragraph'); warnings.push(`Review unsupported <${node.tagName.toLowerCase()}> content converted to text/Markdown.`) }
+      else if (node.matches('div, section, article, main, header, figure, picture, aside, address, hgroup, center, body, span, a')) walk(node)
+      else add(node, 'paragraph')
     }
+    flush()
   }
   if (typeOf(root)) add(root, typeOf(root)!)
   else walk(root)

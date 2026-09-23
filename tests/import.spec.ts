@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { createRequire } from 'node:module'
 import { readFileSync } from 'node:fs'
+import { installFixtureCompanion } from './fixtures/companion'
 const require=createRequire(import.meta.url)
 const { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, ImageRun } = require('docx')
 const JSZip = require('jszip')
@@ -107,12 +108,10 @@ test('DOCX parses native structure and remaps Word styles without uploading',asy
 
 test('documentation discovery stays bounded, selects pages, retains image URLs and keeps review session',async({page})=>{
   const root='https://docs.example.com/guide/', calls:string[]=[]
-  await page.route('**/api/import',async route=>{
-    const {url,kind}=route.request().postDataJSON();calls.push(url)
-    expect(route.request().method()).toBe('POST')
-    expect(route.request().headers().authorization).toBeUndefined()
+  await installFixtureCompanion(page,({url,kind})=>{
+    calls.push(url)
     const html=url===root?'<main><h1>Introduction</h1><p>Welcome.</p><a href="setup.html">Setup</a><a href="setup.html#again">Duplicate</a><a href="https://external.example.com/">External</a><a href="/elsewhere/">Out of path</a><a href="?page=2">Query</a><img src="image.png" alt="Diagram"></main>':'<article><h1>Setup</h1><p>Install this tool.</p><a href="./">Back</a><img src="image.png" alt="Diagram"></article>'
-    await route.fulfill({json:kind==='image'?{url,data:`data:image/png;base64,${png}`}:{url,html}})
+    return kind==='image'?{url,data:`data:image/png;base64,${png}`}:{url,html}
   })
   await page.route('https://docs.example.com/**',async route=>{
     if(route.request().resourceType()==='fetch')calls.push(route.request().url())
@@ -180,16 +179,16 @@ test('document tabs rename on double-click or F2 and brand supports native home 
   await brand.click({button:'middle'})
   await expect(brand).toHaveAttribute('data-middle-prevented','false')
   await expect(page).toHaveURL(/workspace/)
-  await brand.click();await expect(page).toHaveURL('http://127.0.0.1:5173/')
+  const homeUrl=new URL('/',page.url()).href
+  await brand.click();await expect(page).toHaveURL(homeUrl)
 })
 
 
 test('URL import preserves modern remote images when CORS blocks image bytes, and opens existing Markdown editor',async({page})=>{
   const root='https://article.example.com/docs/start.html'
-  await page.route('**/api/import',async route=>{
-    const {url,kind}=route.request().postDataJSON()
-    if(kind==='image'){await route.fulfill({status:502,json:{error:'The source image could not be downloaded.'}});return}
-    await route.fulfill({json:{url,html:'<nav><img src="logo.png">Navigation</nav><main><h1>Robot Guide</h1><button>Copy page</button><h2 id="requirements"><a href="#requirements" aria-label="Navigate to header">Anchor</a>Requirements</h2><p>Use <code>npm install</code>.</p><figure><picture><source srcset="../small.png 320w, ../large.png 1600w"><img alt="Robot" title="Robot setup" src=""></picture><figcaption>Robot screen</figcaption></figure><img data-src="./lazy.png" alt="Lazy diagram"><ul><li><input type="checkbox" checked>Complete<ul><li>Nested</li></ul></li></ul><pre><code class="language-python">  print("hi")</code></pre><table><tr><td colspan="2">Merged</td></tr></table></main>'}})
+  await installFixtureCompanion(page,({url,kind})=>{
+    if(kind==='image')return {error:'The source image could not be downloaded.'}
+    return {url,html:'<nav><img src="logo.png">Navigation</nav><main><h1>Robot Guide</h1><button>Copy page</button><h2 id="requirements"><a href="#requirements" aria-label="Navigate to header">Anchor</a>Requirements</h2><p>Use <code>npm install</code>.</p><figure><picture><source srcset="../small.png 320w, ../large.png 1600w"><img alt="Robot" title="Robot setup" src=""></picture><figcaption>Robot screen</figcaption></figure><img data-src="./lazy.png" alt="Lazy diagram"><ul><li><input type="checkbox" checked>Complete<ul><li>Nested</li></ul></li></ul><pre><code class="language-python">  print("hi")</code></pre><table><tr><td colspan="2">Merged</td></tr></table></main>'}
   })
   await page.route('https://article.example.com/**',async route=>{
     if(route.request().resourceType()==='fetch'){await route.abort('failed');return}
@@ -223,7 +222,7 @@ test('URL import preserves modern remote images when CORS blocks image bytes, an
 })
 
 test('unavailable source offers optional local HTML fallback and retains the source URL',async({page})=>{
-  await page.route('**/api/import',route=>route.fulfill({status:502,json:{error:'The source website returned HTTP 403. Try a different public page.'}}))
+  await installFixtureCompanion(page,()=>({error:'The source website returned HTTP 403. Try a different public page.'}))
   await page.goto('/import')
   await page.getByLabel('Page URL',{exact:true}).fill('https://blocked.example.com/docs/page')
   await page.getByRole('button',{name:'Convert to Markdown',exact:true}).click()
@@ -355,7 +354,7 @@ test('replacement import confirmation retains the review until explicitly accept
 
 test('direct Markdown result is clean, copyable and accessible on mobile without export navigation',async({page,context})=>{
   await context.grantPermissions(['clipboard-read','clipboard-write'])
-  await page.route('**/api/import',route=>route.fulfill({json:{url:'https://example.com/guide',html:'<main><h1>Professional guide</h1><h2 id="setup"><div></div><span>Setup</span></h2><p>Follow <a href="#setup">Setup</a> and use <code>npm install</code>.</p></main>'}}))
+  await installFixtureCompanion(page,()=>({url:'https://example.com/guide',html:'<main><h1>Professional guide</h1><h2 id="setup"><div></div><span>Setup</span></h2><p>Follow <a href="#setup">Setup</a> and use <code>npm install</code>.</p></main>'}))
   await page.goto('/import')
   await page.getByLabel('Page URL',{exact:true}).fill('https://example.com/guide')
   await page.getByRole('button',{name:'Convert to Markdown',exact:true}).click()

@@ -1,0 +1,22 @@
+.button {
+  position: fixed;
+  right: 24px;
+  bottom: 42px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 10px 14px;
+  border: 1px solid var(--um-outline);
+  border-radius: 12px;
+  background: var(--um-surface-container-high);
+  color: var(--um-text);
+  box-shadow: var(--um-elevation-2);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.button:hover { background: var(--um-primary-container); }
+.button:focus-visible { outline: 2px solid var(--um-primary); outline-offset: 3px; }
+@media(max-width:600px) { .button { right: auto; left: 16px; bottom: 112px; } }

@@ -1,5 +1,7 @@
 import { prepareImport } from '@/services/import/prepare'
 import { useConfirmation } from '@/hooks/useConfirmation'
+import { ExtensionAccess } from './ExtensionAccess'
+import { authorizeExtension, getExtensionStatus } from '@/services/import/extension'
 import { resolveImportAssets } from '@/services/import/assets'
 import { useEffect, useRef, useState } from 'react'
 import { FileCode2, FileText, Globe, Network } from 'lucide-react'
@@ -57,6 +59,11 @@ export function ImportSource() {
     return doc
   }
   const replaceSession=()=>!useImportStore.getState().session || confirm({title:'Replace this import review?',description:'Importing another document will replace your current review, including unsaved block changes.',confirmLabel:'Replace review',cancelLabel:'Keep reviewing'})
+  const requestOnPaste = (value: string) => {
+    if (kind !== 'url' && kind !== 'site' || getExtensionStatus().approved) return
+    try { canonicalUrl(value.trim()) } catch { return }
+    void authorizeExtension().catch(reason => setError(reason instanceof Error ? reason.message : 'Could not connect the extension.'))
+  }
   const parse=async(signal:AbortSignal)=>{
     if(!await replaceSession() || signal.aborted) return
     if(kind==='docx') {
@@ -90,8 +97,9 @@ export function ImportSource() {
   }
   return <section className={styles.source} aria-label="Import sources">
     <div className={styles.sourceCards}>{sources.map(({id,name,detail,icon:Icon})=><button key={id} type="button" aria-pressed={kind===id} disabled={busy} onClick={()=>{setKind(id);setFile(null);setError('');setPages([])}}><Icon size={23}/><strong>{name}</strong><small>{detail}</small></button>)}</div>
+    {(kind==='url'||kind==='site')&&<ExtensionAccess/>}
     <div className={styles.form} data-kind={kind}>
-      {(kind==='url'||kind==='site'||kind==='html')&&<label>{kind==='html'?'Source URL (optional, resolves relative links)':'Page URL'}<input type="url" value={url} placeholder="https://docs.example.com/guide/" onChange={e=>{setUrl(e.target.value);setPages([])}} disabled={busy}/></label>}
+      {(kind==='url'||kind==='site'||kind==='html')&&<label>{kind==='html'?'Source URL (optional, resolves relative links)':'Page URL'}<input type="url" value={url} placeholder="https://docs.example.com/guide/" onPaste={e=>requestOnPaste(e.clipboardData.getData('text'))} onChange={e=>{setUrl(e.target.value);setPages([])}} disabled={busy}/></label>}
       {kind==='html'&&<><label>Paste HTML<textarea value={html} onChange={e=>{setHtml(e.target.value);setFile(null)}} rows={6} placeholder="<article><h1>Your document</h1>…</article>" disabled={busy}/></label><label>Or choose HTML (up to 200 MiB)<input type="file" accept=".html,.htm,text/html" disabled={busy} onChange={e=>setFile(e.target.files?.[0]??null)}/></label><label>Image files (optional)<input type="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple disabled={busy} onChange={e=>setImages(Array.from(e.target.files??[]))}/><small>Use matching relative filenames. Ambiguous/missing paths are marked for review.</small></label></>}
       {kind==='docx'&&<label>Choose DOCX<input type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" disabled={busy} onChange={e=>setFile(e.target.files?.[0]??null)}/><small>Up to 200 MiB. Style mappings are available after parsing.</small></label>}
       {kind!=='url'&&<label className={styles.check}><input type="checkbox" checked={options.includeImages} disabled={busy} onChange={e=>setOptions({...options,includeImages:e.target.checked})}/>Include images</label>}

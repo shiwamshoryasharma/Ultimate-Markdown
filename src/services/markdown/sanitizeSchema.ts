@@ -4,7 +4,7 @@ import { defaultSchema, type Schema } from 'hast-util-sanitize'
 // Only generated, scoped styles are reinserted AFTER sanitization.
 export const markdownSanitizeSchema: Schema = {
   ...defaultSchema,
-  tagNames: [...new Set([...(defaultSchema.tagNames ?? []), 'section', 'article', 'aside', 'input', 'video', 'audio', 'source', 'details', 'summary'])],
+  tagNames: [...new Set([...(defaultSchema.tagNames ?? []), 'section', 'article', 'aside', 'input', 'video', 'audio', 'source', 'details', 'summary', 'caption', 'mark', 'u', 'abbr', 'time', 'var', 'samp', 'ruby', 'rt', 'rp'])],
   attributes: {
     ...defaultSchema.attributes,
     '*': [...(defaultSchema.attributes?.['*'] ?? []), 'className', 'style'],
